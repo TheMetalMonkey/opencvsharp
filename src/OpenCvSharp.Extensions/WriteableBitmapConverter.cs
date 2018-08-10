@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !netstandard20
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
@@ -8,7 +9,7 @@ using OpenCvSharp.Util;
 namespace OpenCvSharp.Extensions
 {
     /// <summary>
-    /// Static class which provides conversion between System.Windows.Media.Imaging.WriteableBitmap and IplImage
+    /// Static class which provides conversion between System.Windows.Media.Imaging.WriteableBitmap and Mat
     /// </summary>
     public static class WriteableBitmapConverter
     {
@@ -75,7 +76,7 @@ namespace OpenCvSharp.Extensions
         }
 
         /// <summary>
-        /// 指定したPixelFormatに適合するIplImageのチャンネル数を返す
+        /// 指定したPixelFormatに適合するMatのチャンネル数を返す
         /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
@@ -109,7 +110,7 @@ namespace OpenCvSharp.Extensions
         }
 
         /// <summary>
-        /// 指定したIplImageのビット深度・チャンネル数に適合するPixelFormatを返す
+        /// 指定したMatのビット深度・チャンネル数に適合するPixelFormatを返す
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -139,10 +140,34 @@ namespace OpenCvSharp.Extensions
             if (type == MatType.CV_32FC4)
                 return PixelFormats.Rgba128Float;
 
-            throw new ArgumentOutOfRangeException("type", "Not supported MatType");
+            throw new ArgumentOutOfRangeException(nameof(type), "Not supported MatType");
+        }
+
+        /// <summary>
+        /// BGR -> RGB
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        private static Mat SwapChannelsIfNeeded(Mat src)
+        {
+            var type = src.Type();
+            if (type == MatType.CV_16UC3 || type == MatType.CV_16SC3) // PixelFormats.Rgb48
+            {
+                var dst = new Mat();
+                Cv2.CvtColor(src, dst, ColorConversionCodes.BGR2RGB);
+                return dst;
+            }
+            if (type == MatType.CV_16UC4 || type == MatType.CV_16SC4) // PixelFormats.Rgba64
+            {
+                var dst = new Mat();
+                Cv2.CvtColor(src, dst, ColorConversionCodes.BGRA2RGBA);
+                return dst;
+            }
+            return src;
         }
 
         #region ToWriteableBitmap
+
 #if LANG_JP
         /// <summary>
         /// MatをWriteableBitmapに変換する. 引数はWriteableBitmapのコンストラクタに相当する.
@@ -165,18 +190,20 @@ namespace OpenCvSharp.Extensions
         /// <param name="bp">Bitmap pallette</param>
         /// <returns>WriteableBitmap</returns>
 #endif
-        public static WriteableBitmap ToWriteableBitmap(this Mat src, double dpiX, double dpiY, PixelFormat pf, BitmapPalette bp)
+        public static WriteableBitmap ToWriteableBitmap(this Mat src, double dpiX, double dpiY, PixelFormat pf,
+            BitmapPalette bp)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
-
+                throw new ArgumentNullException(nameof(src));
+            
             var wb = new WriteableBitmap(src.Width, src.Height, dpiX, dpiY, pf, bp);
             ToWriteableBitmap(src, wb);
             return wb;
         }
+
 #if LANG_JP
         /// <summary>
-	    /// MatをWriteableBitmapに変換する (dpi=96, BitmapPalette=null)
+        /// MatをWriteableBitmapに変換する (dpi=96, BitmapPalette=null)
         /// </summary>
         /// <param name="src">変換するMat</param>
         /// <param name="pf">ビットマップの PixelFormat</param>
@@ -193,9 +220,10 @@ namespace OpenCvSharp.Extensions
         {
             return ToWriteableBitmap(src, 96, 96, pf, null);
         }
+
 #if LANG_JP
         /// <summary>
-	    /// MatをWriteableBitmapに変換する (dpi=96, BitmapPalette=null)
+        /// MatをWriteableBitmapに変換する (dpi=96, BitmapPalette=null)
         /// </summary>
         /// <param name="src">変換するMat</param>
         /// <returns>WPFのWriteableBitmap</returns>
@@ -209,7 +237,16 @@ namespace OpenCvSharp.Extensions
         public static WriteableBitmap ToWriteableBitmap(this Mat src)
         {
             PixelFormat pf = GetOptimumPixelFormats(src.Type());
-            return ToWriteableBitmap(src, 96, 96, pf, null);
+            Mat swappedMat = SwapChannelsIfNeeded(src);
+            try
+            {
+                return ToWriteableBitmap(swappedMat, 96, 96, pf, null);
+            }
+            finally
+            {
+                if (src != swappedMat)
+                    swappedMat.Dispose();
+            }
         }
 
 #if LANG_JP
@@ -230,9 +267,9 @@ namespace OpenCvSharp.Extensions
         public static void ToWriteableBitmap(Mat src, WriteableBitmap dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (src.Width != dst.PixelWidth || src.Height != dst.PixelHeight)
                 throw new ArgumentException("size of src must be equal to size of dst");
             //if (src.Depth != BitDepth.U8)
@@ -247,7 +284,7 @@ namespace OpenCvSharp.Extensions
             int channels = GetOptimumChannels(dst.Format);
             if (src.Channels() != channels)
             {
-                throw new ArgumentException("channels of dst != channels of PixelFormat", "dst");
+                throw new ArgumentException("channels of dst != channels of PixelFormat", nameof(dst));
             }
 
             bool submat = src.IsSubmatrix();
@@ -264,9 +301,9 @@ namespace OpenCvSharp.Extensions
 
                     // 手作業で移し替える
                     int stride = w / 8 + 1;
-                    if (stride < 2)                    
+                    if (stride < 2)
                         stride = 2;
-                    
+
                     byte[] pixels = new byte[h * stride];
 
                     for (int x = 0, y = 0; y < h; y++)
@@ -298,7 +335,7 @@ namespace OpenCvSharp.Extensions
 
                 // 一気にコピー            
                 if (!submat && continuous)
-                {                    
+                {
                     long imageSize = src.DataEnd.ToInt64() - src.Data.ToInt64();
                     if (imageSize < 0)
                         throw new OpenCvSharpException("The mat has invalid data pointer");
@@ -320,7 +357,7 @@ namespace OpenCvSharp.Extensions
                     {
                         long offsetSrc = (y * sstep);
                         long offsetDst = (y * dstep);
-                        Utility.CopyMemory(pDst + offsetDst, pSrc + offsetSrc, w * channels);
+                        MemoryHelper.CopyMemory(pDst + offsetDst, pSrc + offsetSrc, w * channels);
                     }
                 }
                 finally
@@ -329,6 +366,8 @@ namespace OpenCvSharp.Extensions
                 }
             }
         }
+
         #endregion
     }
 }
+#endif

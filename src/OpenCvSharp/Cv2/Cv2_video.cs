@@ -18,11 +18,12 @@ namespace OpenCvSharp
             InputArray probImage, ref Rect window, TermCriteria criteria)
         {
             if (probImage == null)
-                throw new ArgumentNullException("probImage");
+                throw new ArgumentNullException(nameof(probImage));
             probImage.ThrowIfDisposed();
 
             RotatedRect result = NativeMethods.video_CamShift(
                 probImage.CvPtr, ref window, criteria);
+            GC.KeepAlive(probImage);
             return result;
         }
 
@@ -37,11 +38,12 @@ namespace OpenCvSharp
             InputArray probImage, ref Rect window, TermCriteria criteria)
         {
             if (probImage == null)
-                throw new ArgumentNullException("probImage");
+                throw new ArgumentNullException(nameof(probImage));
             probImage.ThrowIfDisposed();
 
             int result = NativeMethods.video_meanShift(
                 probImage.CvPtr, ref window, criteria);
+            GC.KeepAlive(probImage);
             return result;
         }
 
@@ -71,9 +73,9 @@ namespace OpenCvSharp
             bool tryReuseInputImage = true)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (pyramid == null)
-                throw new ArgumentNullException("pyramid");
+                throw new ArgumentNullException(nameof(pyramid));
             img.ThrowIfDisposed();
             pyramid.ThrowIfNotReady();
 
@@ -81,6 +83,7 @@ namespace OpenCvSharp
                 img.CvPtr, pyramid.CvPtr, winSize, maxLevel, withDerivatives ? 1 : 0, 
                 (int)pyrBorder, (int)derivBorder, tryReuseInputImage ? 1 : 0);
             pyramid.Fix();
+            GC.KeepAlive(img);
             return result;
         }
 
@@ -110,7 +113,7 @@ namespace OpenCvSharp
             bool tryReuseInputImage = true)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
 
             using (var pyramidVec = new VectorOfMat())
@@ -118,6 +121,7 @@ namespace OpenCvSharp
                 int result = NativeMethods.video_buildOpticalFlowPyramid2(
                     img.CvPtr, pyramidVec.CvPtr, winSize, maxLevel, withDerivatives ? 1 : 0,
                     (int) pyrBorder, (int) derivBorder, tryReuseInputImage ? 1 : 0);
+                GC.KeepAlive(img);
                 pyramid = pyramidVec.ToArray();
                 return result;
             }
@@ -148,17 +152,17 @@ namespace OpenCvSharp
             double minEigThreshold = 1e-4)
         {
             if (prevImg == null)
-                throw new ArgumentNullException("prevImg");
+                throw new ArgumentNullException(nameof(prevImg));
             if (nextImg == null)
-                throw new ArgumentNullException("nextImg");
+                throw new ArgumentNullException(nameof(nextImg));
             if (prevPts == null)
-                throw new ArgumentNullException("prevPts");
+                throw new ArgumentNullException(nameof(prevPts));
             if (nextPts == null)
-                throw new ArgumentNullException("nextPts");
+                throw new ArgumentNullException(nameof(nextPts));
             if (status == null)
-                throw new ArgumentNullException("status");
+                throw new ArgumentNullException(nameof(status));
             if (err == null)
-                throw new ArgumentNullException("err");
+                throw new ArgumentNullException(nameof(err));
             prevImg.ThrowIfDisposed();
             nextImg.ThrowIfDisposed();
             prevPts.ThrowIfDisposed();
@@ -172,9 +176,11 @@ namespace OpenCvSharp
 
             NativeMethods.video_calcOpticalFlowPyrLK_InputArray(
                 prevImg.CvPtr, nextImg.CvPtr, prevPts.CvPtr, nextPts.CvPtr,
-                status.CvPtr, err.CvPtr, winSize0,maxLevel,
+                status.CvPtr, err.CvPtr, winSize0, maxLevel,
                 criteria0, (int)flags, minEigThreshold);
-
+            GC.KeepAlive(prevImg);
+            GC.KeepAlive(nextImg);
+            GC.KeepAlive(prevPts);
             nextPts.Fix();
             status.Fix();
             err.Fix();
@@ -204,13 +210,13 @@ namespace OpenCvSharp
             double minEigThreshold = 1e-4)
         {
             if (prevImg == null)
-                throw new ArgumentNullException("prevImg");
+                throw new ArgumentNullException(nameof(prevImg));
             if (nextImg == null)
-                throw new ArgumentNullException("nextImg");
+                throw new ArgumentNullException(nameof(nextImg));
             if (prevPts == null)
-                throw new ArgumentNullException("prevPts");
+                throw new ArgumentNullException(nameof(prevPts));
             if (nextPts == null)
-                throw new ArgumentNullException("nextPts");
+                throw new ArgumentNullException(nameof(nextPts));
             prevImg.ThrowIfDisposed();
             nextImg.ThrowIfDisposed();
 
@@ -226,6 +232,8 @@ namespace OpenCvSharp
                     prevImg.CvPtr, nextImg.CvPtr, prevPts, prevPts.Length,
                     nextPtsVec.CvPtr, statusVec.CvPtr, errVec.CvPtr, 
                     winSize0, maxLevel, criteria0, (int)flags, minEigThreshold);
+                GC.KeepAlive(prevImg);
+                GC.KeepAlive(nextImg);
                 nextPts = nextPtsVec.ToArray();
                 status = statusVec.ToArray();
                 err = errVec.ToArray();
@@ -257,11 +265,11 @@ namespace OpenCvSharp
             int iterations, int polyN, double polySigma, OpticalFlowFlags flags)
         {
             if (prev == null)
-                throw new ArgumentNullException("prev");
+                throw new ArgumentNullException(nameof(prev));
             if (next == null)
-                throw new ArgumentNullException("next");
+                throw new ArgumentNullException(nameof(next));
             if (flow == null)
-                throw new ArgumentNullException("flow");
+                throw new ArgumentNullException(nameof(flow));
             prev.ThrowIfDisposed();
             next.ThrowIfDisposed();
             flow.ThrowIfNotReady();
@@ -269,7 +277,8 @@ namespace OpenCvSharp
             NativeMethods.video_calcOpticalFlowFarneback(prev.CvPtr, next.CvPtr, 
                 flow.CvPtr, pyrScale, levels, winsize, iterations, polyN, polySigma, 
                 (int)flags);
-
+            GC.KeepAlive(prev);
+            GC.KeepAlive(next);
             flow.Fix();
         }
 
@@ -286,14 +295,16 @@ namespace OpenCvSharp
             InputArray src, InputArray dst, bool fullAffine)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
 
             IntPtr result = NativeMethods.video_estimateRigidTransform(
                 src.CvPtr, dst.CvPtr, fullAffine ? 1 : 0);
+            GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             return new Mat(result);
         }
         

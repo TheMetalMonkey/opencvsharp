@@ -7,7 +7,7 @@ namespace OpenCvSharp.Blob
     /// Struct that contain information about one blob.
     /// </summary>
     [Serializable]
-    public class CvBlob : ICloneable
+    public class CvBlob 
     {
         #region Init
 
@@ -220,9 +220,9 @@ namespace OpenCvSharp.Blob
         public void SaveImage(string fileName, Mat img)
         {
             if (String.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
 
             using (var subMat = img.SubMat(Rect))
             {
@@ -251,10 +251,6 @@ namespace OpenCvSharp.Blob
             double nn = N20 - N02;
             P2 = nn*nn + 4.0*(N11*N11);
         }
-
-        #endregion
-
-        #region ICloneable
 
         /// <summary>
         /// 
@@ -289,11 +285,6 @@ namespace OpenCvSharp.Blob
                 U11 = U11,
                 U20 = U20,
             };
-        }
-
-        object ICloneable.Clone()
-        {
-            return Clone();
         }
 
         #endregion

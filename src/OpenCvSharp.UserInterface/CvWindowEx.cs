@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -238,8 +237,8 @@ namespace OpenCvSharp.UserInterface
 
 #if LANG_JP
         /// <summary>
-	    /// 何かキーが押されるまで待機する．
-	    /// </summary>
+        /// 何かキーが押されるまで待機する．
+        /// </summary>
 #else
         /// <summary>
         /// Waits for a pressed key
@@ -251,8 +250,8 @@ namespace OpenCvSharp.UserInterface
         }
 #if LANG_JP
         /// <summary>
-	    /// 何かキーが押されるまで待機する．
-	    /// </summary>
+        /// 何かキーが押されるまで待機する．
+        /// </summary>
         /// <returns>押されたキーのキーコード</returns>
 #else
         /// <summary>
@@ -298,8 +297,8 @@ namespace OpenCvSharp.UserInterface
 
 #if LANG_JP
         /// <summary>
-	    /// 引数に指定した画像をそれぞれ別のウィンドウで表示し、キー入力待ち状態にする。
-	    /// </summary>
+        /// 引数に指定した画像をそれぞれ別のウィンドウで表示し、キー入力待ち状態にする。
+        /// </summary>
         /// <param name="images">表示させる画像。任意の個数を指定できる。</param>
 #else
         /// <summary>
@@ -311,7 +310,7 @@ namespace OpenCvSharp.UserInterface
         {
             if (images == null)
             {
-                throw new ArgumentNullException("images");
+                throw new ArgumentNullException(nameof(images));
             }
             if (images.Length == 0)
             {

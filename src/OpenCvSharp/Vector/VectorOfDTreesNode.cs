@@ -9,15 +9,8 @@ namespace OpenCvSharp
     /// <summary>
     /// 
     /// </summary>
-    internal class VectorOfDTreesNode : DisposableCvObject, IStdVector<DTrees.Node>
+    public class VectorOfDTreesNode : DisposableCvObject, IStdVector<DTrees.Node>
     {
-        /// <summary>
-        /// Track whether Dispose has been called
-        /// </summary>
-        private bool disposed = false;
-
-        #region Init and Dispose
-
         /// <summary>
         /// 
         /// </summary>
@@ -42,7 +35,7 @@ namespace OpenCvSharp
         public VectorOfDTreesNode(int size)
         {
             if (size < 0)
-                throw new ArgumentOutOfRangeException("size");
+                throw new ArgumentOutOfRangeException(nameof(size));
             ptr = NativeMethods.vector_DTrees_Node_new2(new IntPtr(size));
         }
 
@@ -53,47 +46,31 @@ namespace OpenCvSharp
         public VectorOfDTreesNode(IEnumerable<DTrees.Node> data)
         {
             if (data == null)
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(nameof(data));
             DTrees.Node[] array = EnumerableEx.ToArray(data);
             ptr = NativeMethods.vector_DTrees_Node_new3(array, new IntPtr(array.Length));
         }
 
         /// <summary>
-        /// Clean up any resources being used.
+        /// Releases unmanaged resources
         /// </summary>
-        /// <param name="disposing">
-        /// If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed.
-        /// If false, the method has been called by the runtime from inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-        /// </param>
-        protected override void Dispose(bool disposing)
+        protected override void DisposeUnmanaged()
         {
-            if (!disposed)
-            {
-                try
-                {
-                    if (IsEnabledDispose)
-                    {
-                        NativeMethods.vector_DTrees_Node_delete(ptr);
-                    }
-                    disposed = true;
-                }
-                finally
-                {
-                    base.Dispose(disposing);
-                }
-            }
+            NativeMethods.vector_DTrees_Node_delete(ptr);
+            base.DisposeUnmanaged();
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// vector.size()
         /// </summary>
         public int Size
         {
-            get { return NativeMethods.vector_DTrees_Node_getSize(ptr).ToInt32(); }
+            get
+            {
+                var res = NativeMethods.vector_DTrees_Node_getSize(ptr).ToInt32();
+                GC.KeepAlive(this);
+                return res;
+            }
         }
 
         /// <summary>
@@ -101,12 +78,13 @@ namespace OpenCvSharp
         /// </summary>
         public IntPtr ElemPtr
         {
-            get { return NativeMethods.vector_DTrees_Node_getPointer(ptr); }
+            get
+            {
+                var res = NativeMethods.vector_DTrees_Node_getPointer(ptr);
+                GC.KeepAlive(this);
+                return res;
+            }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Converts std::vector to managed array
@@ -122,11 +100,11 @@ namespace OpenCvSharp
             var dst = new DTrees.Node[size];
             using (var dstPtr = new ArrayAddress1<DTrees.Node>(dst))
             {
-                Utility.CopyMemory(dstPtr, ElemPtr, Marshal.SizeOf(typeof(DTrees.Node)) * dst.Length);
+                MemoryHelper.CopyMemory(dstPtr, ElemPtr, MarshalHelper.SizeOf<DTrees.Node>() * dst.Length);
             }
+            GC.KeepAlive(this); // ElemPtr is IntPtr to memory held by this object, so
+                                // make sure we are not disposed until finished with copy.
             return dst;
         }
-
-        #endregion
     }
 }

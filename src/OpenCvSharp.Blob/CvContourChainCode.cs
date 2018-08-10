@@ -24,7 +24,7 @@ namespace OpenCvSharp.Blob
     /// <summary>
     /// 
     /// </summary>
-    public class CvContourChainCode : ICloneable
+    public class CvContourChainCode
     {
         /// <summary>
         /// Point where contour begin.
@@ -112,7 +112,7 @@ namespace OpenCvSharp.Blob
         public void Render(Mat img, Scalar color)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (img.Type() != MatType.CV_8UC3)
                 throw new ArgumentException("Invalid img format (U8 3-channels)");
 
@@ -138,11 +138,6 @@ namespace OpenCvSharp.Blob
                 ChainCode = new List<CvChainCode>(ChainCode),
                 StartingPoint = StartingPoint,
             };
-        }
-
-        object ICloneable.Clone()
-        {
-            return Clone();
         }
     }
 }

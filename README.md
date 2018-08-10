@@ -1,29 +1,31 @@
-#OpenCvSharp
+# OpenCvSharp [![Build status](https://ci.appveyor.com/api/projects/status/dvjexft02s6b3re6/branch/master?svg=true)](https://ci.appveyor.com/project/shimat/opencvsharp/branch/master) [![GitHub license](https://img.shields.io/github/license/shimat/opencvsharp.svg)](https://github.com/shimat/opencvsharp/blob/master/LICENSE) 
+
 Cross platform wrapper of OpenCV for .NET Framework.
 
-OpenCVを.NET Frameworkから利用するための、クロスプラットフォームで動作するラッパーです。
+Old versions of OpenCvSharp is maintained in [opencvsharp_2410](https://github.com/shimat/opencvsharp_2410).
 
 ## Installation
 ### NuGet
-If you have Visual Studio 2012 or later, it is recommended to use [NuGet](http://www.nuget.org/). Search *'opencvsharp'* on the NuGet Package Manager.
+If you have Visual Studio 2012 or later, it is recommended to use [NuGet](http://www.nuget.org/). Search *'opencvsharp3'* on the NuGet Package Manager.
 
-* [OpenCV3.1 All-in-one package](https://www.nuget.org/packages/OpenCvSharp3-AnyCPU/) - bundles native OpenCV DLLs
-* [OpenCV3.1 Minimum package](https://www.nuget.org/packages/OpenCvSharp3-WithoutDll/) 
-* [OpenCV2.4.10 All-in-one package](https://www.nuget.org/packages/OpenCvSharp-AnyCPU/) - bundles native OpenCV DLLs
-* [OpenCV2.4.10 Minimum package](https://www.nuget.org/packages/OpenCvSharp-WithoutDll/) 
+| Package                                                      | NuGet                                                                                                                      |
+|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| All-in-one package - bundles native OpenCV DLLs    | [![NuGet version](https://badge.fury.io/nu/OpenCvSharp3-AnyCPU.svg)](https://badge.fury.io/nu/OpenCvSharp3-AnyCPU)         |
+| Minimum package                                    | [![NuGet version](https://badge.fury.io/nu/OpenCvSharp3-WithoutDll.svg)](https://badge.fury.io/nu/OpenCvSharp3-WithoutDll) |
+| Development Build Package    | https://ci.appveyor.com/nuget/opencvsharp |
 
 ### Downloads
 If you do not use NuGet, get DLL files from the [release page](https://github.com/shimat/opencvsharp/releases).
 
 ## Requirements
-* [OpenCV 3.1 / 2.4.10](http://opencv.org/)
-* [Visual C++ 2013 Redistributable Package](http://www.microsoft.com/en-US/download/details.aspx?id=30679)
-* [.NET Framework 2.0](http://www.microsoft.com/ja-jp/download/details.aspx?id=1639) or later / [Mono](http://www.mono-project.com/Main_Page)
+* [OpenCV 3.4.1](http://opencv.org/)
+* [Visual C++ 2017 Redistributable Package](https://go.microsoft.com/fwlink/?LinkId=746572)
+* [.NET Framework 2.0](http://www.microsoft.com/ja-jp/download/details.aspx?id=1639) or later / [.NET Core 2.0](https://www.microsoft.com/net/download) / [Mono](http://www.mono-project.com/Main_Page)
 
-On Windows, OpenCvSharp requires OpenCV DLL files built with VC++2013 (msvcr120.dll). The official pre-built DLL files in build/[x86 or x64]/vc12/bin are suitable.
+OpenCvSharp may not work on UWP and Unity platform. Please consider using [OpenCV for Unity](https://www.assetstore.unity3d.com/en/#!/content/21088)
 
 ## Documents
-http://shimat.github.io/opencvsharp/
+https://shimat.github.io/opencvsharp_docs/index.html
 
 ## Usage
 For more details, see the **[Wiki](https://github.com/shimat/opencvsharp/wiki)** page.
@@ -31,15 +33,14 @@ For more details, see the **[Wiki](https://github.com/shimat/opencvsharp/wiki)**
 ```C#
 // Edge detection by Canny algorithm
 using OpenCvSharp;
-// using OpenCvSharp.CPlusPlus;  //for OpenCvSharp2
 
 class Program 
 {
     static void Main() 
     {
-        Mat src = new Mat("lenna.png", ImreadModes.GrayScale);   // OpenCvSharp 3.x
-        //Mat src = new Mat("lenna.png", LoadMode.GrayScale); // OpenCvSharp 2.4.x
-        Mat dst = new Mat();
+        Mat src = new Mat("lenna.png", ImreadModes.GrayScale);
+        // Mat src = Cv2.ImRead("lenna.png", ImreadModes.GrayScale);
+        Mat dst = new Mat();
         
         Cv2.Canny(src, dst, 50, 200);
         using (new Window("src image", src)) 
@@ -58,17 +59,17 @@ class Program
 * OpenCvSharp provides functions for converting from Mat/IplImage into Bitmap(GDI+) or WriteableBitmap(WPF).
 * OpenCvSharp can work on [Mono](http://www.mono-project.com/Main_Page). It can run on any platform which [Mono](http://www.mono-project.com/Main_Page) supports (e.g. Linux). 
 
------
-
-* オリジナルのC/C++コードと可能な限り似た記述ができるように設計しています。
-* 多くのクラスがIDisposableインターフェイスを実装しているので、ネイティブリソース管理が容易です。
-* オブジェクト指向な書き方を強制しません。OpenCVのネイティブの関数をそのままの形式で呼べます。
-* GDI+やWPFとの相互利用が可能です。OpenCVのMat/IplImageとGDI+のBitmapやWPFのWriteableBitmapとの変換機能があります。
-* [Mono](http://www.mono-project.com/Main_Page)に対応しています。Linux等のクロスプラットフォームで動作します。
-
+## OpenCvSharp Build Instructions
+- Install Visual Studio 2017 or later
+  - VC++ features are required.
+- Get all submodules
+```
+git submodule update --init --recursive
+```
+- Build tesseract and leptonica
+  - Open `tesseract/tesseract.sln` and build
+- Build OpenCvSharp
+  - Open `OpenCvSharp.sln` and build
 
 ## License
-OpenCvSharp is licensed under the 
-**BSD 3-Clause License**. See [LICENSE.txt](https://github.com/shimat/opencvsharp/blob/master/LICENSE.txt).
-
-OpenCvSharp.Blob uses [cvBlob](https://code.google.com/p/cvblob/) to implement blob extraction.
+Licensed under the [BSD 3-Clause License](https://github.com/shimat/opencvsharp/blob/master/LICENSE).

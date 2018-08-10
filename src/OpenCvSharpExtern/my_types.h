@@ -17,79 +17,162 @@ namespace cv
 
 extern "C" 
 {
-	#pragma region OpenCV1.0-compatible Types
+    #pragma region OpenCV1.0-compatible Types
 
-	typedef struct MyCvPoint
-	{
-		int x;
-		int y;
-	} MyCvPoint;
+    struct MyCvPoint
+    {
+        int x;
+        int y;
+    };
+    struct MyCvPoint2D32f
+    {
+        float x;
+        float y;
+    };
+    struct MyCvPoint2D64f
+    {
+        double x;
+        double y;
+    };
 
-	typedef struct MyCvPoint2D32f
-	{
-		float x;
-		float y;
-	} MyCvPoint2D32f;
+    struct MyCvPoint3D32i
+    {
+        int x;
+        int y;
+        int z;
+    };
+    struct MyCvPoint3D32f
+    {
+        float x;
+        float y;
+        float z;
+    };
+    struct MyCvPoint3D64f
+    {
+        double x;
+        double y;
+        double z;
+    };
 
-	typedef struct MyCvSize
-	{
-		int width;
-		int height;
-	} MyCvSize;
+    struct MyCvSize
+    {
+        int width;
+        int height;
+    };
+    struct MyCvSize2D32f
+    {
+        float width;
+        float height;
+    };
+    struct MyCvSize2D64f
+    {
+        double width;
+        double height;
+    };
 
-	typedef struct MyCvSize2D32f
-	{
-		float width;
-		float height;
-	} MyCvSize2D32f;
+    struct MyCvRect
+    {
+        int x;
+        int y;
+        int width;
+        int height;
+    };
+    struct MyCvRect2D32f
+    {
+        float x;
+        float y;
+        float width;
+        float height;
+    };
+    struct MyCvRect2D64f
+    {
+        double x;
+        double y;
+        double width;
+        double height;
+    };
 
-	typedef struct MyCvRect
-	{
-		int x;
-		int y;
-		int width;
-		int height;
-	} MyCvRect;
+    struct MyCvScalar
+    {
+        double val[4];
+    };
 
-	typedef struct MyCvScalar
-	{
-		double val[4];
-	} MyCvScalar;
-
-    typedef struct MyCvSlice
+    struct MyCvSlice
     {
         int  start_index, end_index;
-    } MyCvSlice;
+    };
 
-	typedef struct MyCvMoments
-	{
-		double  m00, m10, m01, m20, m11, m02, m30, m21, m12, m03; /* spatial moments */
-		double  mu20, mu11, mu02, mu30, mu21, mu12, mu03; /* central moments */
-		double  inv_sqrt_m00; /* m00 != 0 ? 1/sqrt(m00) : 0 */
-	} MyCvMoments;
+    struct MyCvMoments
+    {
+        double  m00, m10, m01, m20, m11, m02, m30, m21, m12, m03; /* spatial moments */
+        double  mu20, mu11, mu02, mu30, mu21, mu12, mu03; /* central moments */
+        double  inv_sqrt_m00; /* m00 != 0 ? 1/sqrt(m00) : 0 */
+    };
 
-	typedef struct MyCvTermCriteria
-	{
-		int    type;
-		int    max_iter;
-		double epsilon;
-	} MyCvTermCriteria;
+    struct MyCvTermCriteria
+    {
+        int    type;
+        int    max_iter;
+        double epsilon;
+    };
 
-	typedef struct MyCvBox2D
-	{
-		MyCvPoint2D32f center; 
-		MyCvSize2D32f  size;
-		float angle;
-	} MyCvBox2D;
+    struct MyCvBox2D
+    {
+        MyCvPoint2D32f center; 
+        MyCvSize2D32f  size;
+        float angle;
+    };
 
-	#pragma endregion
+    struct MyKeyPoint
+    {
+        MyCvPoint2D32f pt; 
+        float size; 
+        float angle;
+        float response; 
+        int octave; 
+        int class_id; 
+    };
 
-	typedef struct CvPoint3D
-	{
-		int x;
-		int y;
-		int z;
-	} CvPoint3D;
+    struct MyDMatch
+    {
+        int queryIdx;
+        int trainIdx; 
+        int imgIdx;
+        float distance;
+    };
+
+    #pragma endregion
+
+    struct CvPoint3D
+    {
+        int x;
+        int y;
+        int z;
+    };
+
+    struct aruco_DetectorParameters 
+    {
+        int adaptiveThreshWinSizeMin;
+        int adaptiveThreshWinSizeMax;
+        int adaptiveThreshWinSizeStep;
+        double adaptiveThreshConstant;
+        double minMarkerPerimeterRate;
+        double maxMarkerPerimeterRate;
+        double polygonalApproxAccuracyRate;
+        double minCornerDistanceRate;
+        int minDistanceToBorder;
+        double minMarkerDistanceRate;
+        int doCornerRefinement; // bool
+        int cornerRefinementWinSize;
+        int cornerRefinementMaxIterations;
+        double cornerRefinementMinAccuracy;
+        int markerBorderBits;
+        int perspectiveRemovePixelPerCell;
+        double perspectiveRemoveIgnoredMarginPerCell;
+        double maxErroneousBitsInBorderRate;
+        double minOtsuStdDev;
+        double errorCorrectionRate;
+    };
 
     typedef struct CvVec2b { uchar val[2]; } CvVec2b;
     typedef struct CvVec3b { uchar val[3]; } CvVec3b;
@@ -118,124 +201,229 @@ extern "C"
 }
 
 
-static MyCvPoint c(cv::Point p)
+static MyCvPoint c(const cv::Point p)
 {
-	MyCvPoint ret = { p.x, p.y };
-	return ret;
+	const MyCvPoint ret = { p.x, p.y };
+    return ret;
 }
-static cv::Point cpp(MyCvPoint p)
+static cv::Point cpp(const MyCvPoint p)
 {
-	return cv::Point(p.x, p.y);
-}
-
-static MyCvPoint2D32f c(cv::Point2f p)
-{
-	MyCvPoint2D32f ret = { p.x, p.y };
-	return ret;
-}
-static cv::Point2f cpp(MyCvPoint2D32f p)
-{
-	return cv::Point2f(p.x, p.y);
+    return cv::Point(p.x, p.y);
 }
 
-static MyCvSize c(cv::Size s)
+static MyCvPoint2D32f c(const cv::Point2f p)
 {
-	MyCvSize ret = { s.width, s.height };
-	return ret;
+	const MyCvPoint2D32f ret = { p.x, p.y };
+    return ret;
 }
-static cv::Size cpp(MyCvSize s)
+static cv::Point2f cpp(const MyCvPoint2D32f p)
 {
-	return cv::Size(s.width, s.height);
-}
-
-static MyCvSize2D32f c(cv::Size2f s)
-{
-	MyCvSize2D32f ret = { s.width, s.height };
-	return ret;
-}
-static cv::Size2f cpp(MyCvSize2D32f s)
-{
-	return cv::Size2f(s.width, s.height);
+    return cv::Point2f(p.x, p.y);
 }
 
-static MyCvRect c(cv::Rect r)
+static MyCvSize c(const cv::Size s)
 {
-	MyCvRect ret = { r.x, r.y, r.width, r.height };
-	return ret;
+	const MyCvSize ret = { s.width, s.height };
+    return ret;
 }
-static cv::Rect cpp(MyCvRect r)
+static cv::Size cpp(const MyCvSize s)
 {
-	return cv::Rect(r.x, r.y, r.width, r.height);
-}
-
-static MyCvScalar c(cv::Scalar s)
-{
-	MyCvScalar ret;
-	ret.val[0] = s[0];
-	ret.val[1] = s[1];
-	ret.val[2] = s[2];
-	ret.val[3] = s[3];
-	return ret;
-}
-static cv::Scalar cpp(MyCvScalar s)
-{
-	return cv::Scalar(s.val[0], s.val[1], s.val[2], s.val[3]);
+    return cv::Size(s.width, s.height);
 }
 
-static MyCvSlice c(cv::Range s)
+static MyCvSize2D32f c(const cv::Size2f s)
 {
-	MyCvSlice ret;
+	const MyCvSize2D32f ret = { s.width, s.height };
+    return ret;
+}
+static cv::Size2f cpp(const MyCvSize2D32f s)
+{
+    return cv::Size2f(s.width, s.height);
+}
+
+static MyCvRect c(const cv::Rect r)
+{
+	const MyCvRect ret = { r.x, r.y, r.width, r.height };
+    return ret;
+}
+static cv::Rect cpp(const MyCvRect r)
+{
+    return cv::Rect(r.x, r.y, r.width, r.height);
+}
+
+static MyCvRect2D64f c(const cv::Rect2d r)
+{
+	const MyCvRect2D64f ret = { r.x, r.y, r.width, r.height };
+    return ret;
+}
+static cv::Rect2d cpp(const MyCvRect2D64f r)
+{
+    return cv::Rect2d(r.x, r.y, r.width, r.height);
+}
+
+static MyCvScalar c(const cv::Scalar s)
+{
+    MyCvScalar ret;
+    ret.val[0] = s[0];
+    ret.val[1] = s[1];
+    ret.val[2] = s[2];
+    ret.val[3] = s[3];
+    return ret;
+}
+static cv::Scalar cpp(const MyCvScalar s)
+{
+    return cv::Scalar(s.val[0], s.val[1], s.val[2], s.val[3]);
+}
+
+static CvVec4i c(const cv::Vec4i v)
+{
+    CvVec4i vv;
+    vv.val[0] = v.val[0];
+    vv.val[1] = v.val[1];
+    vv.val[2] = v.val[2];
+    vv.val[3] = v.val[3];
+    return vv;
+}
+static cv::Vec4i cpp(const CvVec4i v)
+{
+    return cv::Vec4i(v.val[0], v.val[1], v.val[2], v.val[3]);
+}
+
+static MyCvSlice c(const cv::Range s)
+{
+    MyCvSlice ret;
     ret.start_index = s.start;
     ret.end_index = s.end;
-	return ret;
+    return ret;
 }
-static cv::Range cpp(MyCvSlice s)
+static cv::Range cpp(const MyCvSlice s)
 {
-	return cv::Range(s.start_index, s.end_index);
-}
-
-static MyCvMoments c(cv::Moments m)
-{
-	MyCvMoments ret;
-	ret.m00 = m.m00; ret.m10 = m.m10; ret.m01 = m.m01;
-	ret.m20 = m.m20; ret.m11 = m.m11; ret.m02 = m.m02;
-	ret.m30 = m.m30; ret.m21 = m.m21; ret.m12 = m.m12; ret.m03 = m.m03;
-	ret.mu20 = m.mu20; ret.mu11 = m.mu11; ret.mu02 = m.mu02;
-	ret.mu30 = m.mu30; ret.mu21 = m.mu21; ret.mu12 = m.mu12; ret.mu03 = m.mu03;
-	double am00 = std::abs(m.m00);
-	ret.inv_sqrt_m00 = am00 > DBL_EPSILON ? 1. / std::sqrt(am00) : 0;
-
-	return ret;
-}
-static cv::Moments cpp(MyCvMoments m)
-{
-	return cv::Moments(m.m00, m.m10, m.m01, m.m20, m.m11, m.m02, m.m30, m.m21, m.m12, m.m03);
+    return cv::Range(s.start_index, s.end_index);
 }
 
-static MyCvTermCriteria c(cv::TermCriteria tc)
+static MyCvMoments c(const cv::Moments m)
 {
-	MyCvTermCriteria ret;
-	ret.type = tc.type;
-	ret.max_iter = tc.maxCount;
-	ret.epsilon = tc.epsilon;
-	return ret;
+    MyCvMoments ret;
+    ret.m00 = m.m00; ret.m10 = m.m10; ret.m01 = m.m01;
+    ret.m20 = m.m20; ret.m11 = m.m11; ret.m02 = m.m02;
+    ret.m30 = m.m30; ret.m21 = m.m21; ret.m12 = m.m12; ret.m03 = m.m03;
+    ret.mu20 = m.mu20; ret.mu11 = m.mu11; ret.mu02 = m.mu02;
+    ret.mu30 = m.mu30; ret.mu21 = m.mu21; ret.mu12 = m.mu12; ret.mu03 = m.mu03;
+	const double am00 = std::abs(m.m00);
+    ret.inv_sqrt_m00 = am00 > DBL_EPSILON ? 1. / std::sqrt(am00) : 0;
+
+    return ret;
 }
-static cv::TermCriteria cpp(MyCvTermCriteria tc)
+static cv::Moments cpp(const MyCvMoments m)
 {
-	return cv::TermCriteria(tc.type, tc.max_iter, tc.epsilon);
+    return cv::Moments(m.m00, m.m10, m.m01, m.m20, m.m11, m.m02, m.m30, m.m21, m.m12, m.m03);
 }
 
-static MyCvBox2D c(cv::RotatedRect r)
+static MyCvTermCriteria c(const cv::TermCriteria tc)
 {
-	MyCvBox2D ret;
-	ret.center = c(r.center);
-	ret.size = c(r.size);
-	ret.angle = r.angle;
-	return ret;
+    MyCvTermCriteria ret;
+    ret.type = tc.type;
+    ret.max_iter = tc.maxCount;
+    ret.epsilon = tc.epsilon;
+    return ret;
 }
-static cv::RotatedRect cpp(MyCvBox2D b)
+static cv::TermCriteria cpp(const MyCvTermCriteria tc)
 {
-	return cv::RotatedRect(cpp(b.center), cpp(b.size), b.angle);
+    return cv::TermCriteria(tc.type, tc.max_iter, tc.epsilon);
+}
+
+static MyCvBox2D c(const cv::RotatedRect r)
+{
+    MyCvBox2D ret;
+    ret.center = c(r.center);
+    ret.size = c(r.size);
+    ret.angle = r.angle;
+    return ret;
+}
+static cv::RotatedRect cpp(const MyCvBox2D b)
+{
+    return cv::RotatedRect(cpp(b.center), cpp(b.size), b.angle);
+}
+
+static cv::KeyPoint cpp(const MyKeyPoint k)
+{
+    return cv::KeyPoint(cpp(k.pt), k.size, k.angle, k.response, k.octave, k.class_id);
+}
+static MyKeyPoint c(const cv::KeyPoint k)
+{
+    MyKeyPoint ret;
+    ret.pt = c(k.pt);
+    ret.size = k.size;
+    ret.angle = k.angle;
+    ret.response = k.response;
+    ret.octave = k.octave;
+    ret.class_id = k.class_id;
+    return ret;
+}
+
+static cv::DMatch cpp(const MyDMatch d)
+{
+    return cv::DMatch(d.queryIdx, d.trainIdx, d.imgIdx, d.distance);
+}
+static MyDMatch c(const cv::DMatch d)
+{
+    MyDMatch ret;
+    ret.queryIdx = d.queryIdx;
+    ret.trainIdx = d.trainIdx;
+    ret.imgIdx = d.imgIdx;
+    ret.distance = d.distance;
+    return ret;
+}
+
+static cv::aruco::DetectorParameters cpp(const aruco_DetectorParameters p)
+{
+    cv::aruco::DetectorParameters pp;
+    pp.adaptiveThreshWinSizeMin = p.adaptiveThreshWinSizeMin;
+    pp.adaptiveThreshWinSizeMax = p.adaptiveThreshWinSizeMax;
+    pp.adaptiveThreshWinSizeStep = p.adaptiveThreshWinSizeStep;
+    pp.adaptiveThreshConstant = p.adaptiveThreshConstant;
+    pp.minMarkerPerimeterRate = p.minMarkerPerimeterRate;
+    pp.maxMarkerPerimeterRate = p.maxMarkerPerimeterRate;
+    pp.polygonalApproxAccuracyRate = p.polygonalApproxAccuracyRate;
+    pp.minCornerDistanceRate = p.minCornerDistanceRate;
+    pp.minDistanceToBorder = p.minDistanceToBorder;
+    pp.minMarkerDistanceRate = p.minMarkerDistanceRate;
+    //pp.doCornerRefinement = p.doCornerRefinement != 0;
+    pp.cornerRefinementWinSize = p.cornerRefinementWinSize;
+    pp.cornerRefinementMaxIterations = p.cornerRefinementMaxIterations;
+    pp.cornerRefinementMinAccuracy = p.cornerRefinementMinAccuracy;
+    pp.markerBorderBits = p.markerBorderBits;
+    pp.perspectiveRemovePixelPerCell = p.perspectiveRemovePixelPerCell;
+    pp.perspectiveRemoveIgnoredMarginPerCell = p.perspectiveRemoveIgnoredMarginPerCell;;
+    pp.maxErroneousBitsInBorderRate = p.maxErroneousBitsInBorderRate;
+    pp.minOtsuStdDev = p.minOtsuStdDev;
+    pp.errorCorrectionRate = p.errorCorrectionRate;
+    return pp;
+}
+static aruco_DetectorParameters c(const cv::aruco::DetectorParameters &p)
+{
+    aruco_DetectorParameters pp;
+    pp.adaptiveThreshWinSizeMin = p.adaptiveThreshWinSizeMin;
+    pp.adaptiveThreshWinSizeMax = p.adaptiveThreshWinSizeMax;
+    pp.adaptiveThreshWinSizeStep = p.adaptiveThreshWinSizeStep;
+    pp.adaptiveThreshConstant = p.adaptiveThreshConstant;
+    pp.minMarkerPerimeterRate = p.minMarkerPerimeterRate;
+    pp.maxMarkerPerimeterRate = p.maxMarkerPerimeterRate;
+    pp.polygonalApproxAccuracyRate = p.polygonalApproxAccuracyRate;
+    pp.minCornerDistanceRate = p.minCornerDistanceRate;
+    pp.minDistanceToBorder = p.minDistanceToBorder;
+    pp.minMarkerDistanceRate = p.minMarkerDistanceRate;
+    //pp.doCornerRefinement = p.doCornerRefinement ? 1 : 0;
+    pp.cornerRefinementWinSize = p.cornerRefinementWinSize;
+    pp.cornerRefinementMaxIterations = p.cornerRefinementMaxIterations;
+    pp.cornerRefinementMinAccuracy = p.cornerRefinementMinAccuracy;
+    pp.markerBorderBits = p.markerBorderBits;
+    pp.perspectiveRemovePixelPerCell = p.perspectiveRemovePixelPerCell;
+    pp.perspectiveRemoveIgnoredMarginPerCell = p.perspectiveRemoveIgnoredMarginPerCell;;
+    pp.maxErroneousBitsInBorderRate = p.maxErroneousBitsInBorderRate;
+    pp.minOtsuStdDev = p.minOtsuStdDev;
+    pp.errorCorrectionRate = p.errorCorrectionRate;
+    return pp;
 }
 
 #endif

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using OpenCvSharp.Extensions;
 
@@ -58,7 +56,7 @@ namespace OpenCvSharp.UserInterface
             {
                 if (value != null && value.IsDisposed)
                 {
-                    throw new ArgumentException("the image is disposed.", "value");
+                    throw new ArgumentException("the image is disposed.", nameof(value));
                 }
 
                 imageIpl = value;

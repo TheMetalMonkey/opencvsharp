@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+#if DOTNET_FRAMEWORK
 using System.Security;
 using System.Security.Permissions;
+#endif
 using OpenCvSharp.Util;
 
 // ReSharper disable InconsistentNaming
@@ -14,7 +16,9 @@ namespace OpenCvSharp
     /// <summary>
     /// P/Invoke methods of OpenCV 2.x C++ interface
     /// </summary>
+#if DOTNET_FRAMEWORK && !net20
     [SuppressUnmanagedCodeSecurity]
+#endif
     public static partial class NativeMethods
     {
         /// <summary>
@@ -22,31 +26,31 @@ namespace OpenCvSharp
         /// </summary>
         private static bool tried = false;
 
-        public const string DllMsvcr = "msvcr120";
-        public const string DllMsvcp = "msvcp120";
-
+        //public const string DllVCRuntime = "vcruntime140";
+        //public const string DllMsvcp = "msvcp140";
         public const string DllExtern = "OpenCvSharpExtern";
-
-        public const string Version = "310";
+        public const string Version = "331";
 
         private static readonly string[] RuntimeDllNames =
         {
-            DllMsvcr,
-            DllMsvcp,
+            //DllVCRuntime,
+            //DllMsvcp,
         };
 
         private static readonly string[] OpenCVDllNames =
         {
-            "opencv_world",
+            //"opencv_world",
         };
 
         public const string DllFfmpegX86 = "opencv_ffmpeg" + Version;
         public const string DllFfmpegX64 = DllFfmpegX86 + "_64";
-        
+
         /// <summary>
         /// Static constructor
         /// </summary>
+#if DOTNET_FRAMEWORK
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
         static NativeMethods()
         {
             LoadLibraries(WindowsLibraryLoader.Instance.AdditionalPaths);
@@ -64,10 +68,11 @@ namespace OpenCvSharp
             if (IsUnix())
                 return;
 
-            string[] ap = EnumerableEx.ToArray(additionalPaths);
+            string[] ap = additionalPaths == null ? new string[0] : EnumerableEx.ToArray(additionalPaths);
             List<string> runtimePaths = new List<string> (ap);
+#if DOTNET_FRAMEWORK
             runtimePaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.System));
-            
+#endif
             foreach (string dll in RuntimeDllNames)
             {
                 WindowsLibraryLoader.Instance.LoadLibrary(dll, runtimePaths);
@@ -86,10 +91,12 @@ namespace OpenCvSharp
             IntPtr current = redirectError(ErrorHandlerThrowException, zero, ref zero);
             if (current != IntPtr.Zero)
             {
+#if net20 || net40
                 ErrorHandlerDefault = (CvErrorCallback)Marshal.GetDelegateForFunctionPointer(
-                    current,
-                    typeof(CvErrorCallback)
-                );
+                    current, typeof(CvErrorCallback));
+#else
+                ErrorHandlerDefault = Marshal.GetDelegateForFunctionPointer<CvErrorCallback>(current);
+#endif
             }
             else
             {
@@ -100,7 +107,7 @@ namespace OpenCvSharp
         /// <summary>
         /// Checks whether PInvoke functions can be called
         /// </summary>
-        private static void TryPInvoke()
+        public static void TryPInvoke()
         {
             if (tried)
                 return;
@@ -133,7 +140,7 @@ namespace OpenCvSharp
                 Exception ex = e.InnerException ?? e;
                 try{ Console.WriteLine(ex.Message); }
                 catch{}
-                try{ Debug.WriteLine(ex.Message); }
+                try { Debug.WriteLine(ex.Message); }
                 catch{}
                 throw;
             }
@@ -154,10 +161,17 @@ namespace OpenCvSharp
         /// <returns></returns>
         public static bool IsUnix()
         {
+#if DOTNET_FRAMEWORK
             var p = Environment.OSVersion.Platform;
             return (p == PlatformID.Unix ||
                     p == PlatformID.MacOSX ||
                     (int)p == 128);
+#elif uap10
+            return false;
+#else
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
+                RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+#endif
         }
 
         /// <summary>
@@ -169,7 +183,7 @@ namespace OpenCvSharp
             return (Type.GetType("Mono.Runtime") != null);
         }
 
-        #region Error redirection
+#region Error redirection
         /// <summary>
         /// Custom error handler to be thrown by OpenCV
         /// </summary>
@@ -183,7 +197,6 @@ namespace OpenCvSharp
                 }
                 finally
                 {
-
                     throw new OpenCVException(status, funcName, errMsg, fileName, line);
                 }
             };
@@ -202,6 +215,6 @@ namespace OpenCvSharp
         /// Default error handler
         /// </summary>
         public static CvErrorCallback ErrorHandlerDefault;
-        #endregion
+#endregion
     }
 }

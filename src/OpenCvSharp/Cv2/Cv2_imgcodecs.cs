@@ -27,7 +27,7 @@ namespace OpenCvSharp
         public static bool ImReadMulti(string filename, out Mat[] mats, ImreadModes flags = ImreadModes.AnyColor)
         {
             if (filename == null) 
-                throw new ArgumentNullException("filename");
+                throw new ArgumentNullException(nameof(filename));
 
             using (var matsVec = new VectorOfMat())
             {
@@ -47,13 +47,15 @@ namespace OpenCvSharp
         public static bool ImWrite(string fileName, Mat img, int[] prms = null)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (prms == null)
                 prms = new int[0];
 
-            return NativeMethods.imgcodecs_imwrite(fileName, img.CvPtr, prms, prms.Length) != 0;
+            var res = NativeMethods.imgcodecs_imwrite(fileName, img.CvPtr, prms, prms.Length) != 0;
+            GC.KeepAlive(img);
+            return res;
         }
 
         /// <summary>
@@ -88,7 +90,7 @@ namespace OpenCvSharp
         public static Mat ImDecode(Mat buf, ImreadModes flags)
         {
             if (buf == null)
-                throw new ArgumentNullException("buf");
+                throw new ArgumentNullException(nameof(buf));
             buf.ThrowIfDisposed();
             IntPtr matPtr = NativeMethods.imgcodecs_imdecode_Mat(buf.CvPtr, (int) flags);
             GC.KeepAlive(buf);
@@ -104,7 +106,7 @@ namespace OpenCvSharp
         public static Mat ImDecode(InputArray buf, ImreadModes flags)
         {
             if (buf == null)
-                throw new ArgumentNullException("buf");
+                throw new ArgumentNullException(nameof(buf));
             buf.ThrowIfDisposed();
             IntPtr matPtr = NativeMethods.imgcodecs_imdecode_InputArray(buf.CvPtr, (int) flags);
             GC.KeepAlive(buf);
@@ -120,9 +122,9 @@ namespace OpenCvSharp
         public static Mat ImDecode(byte[] buf, ImreadModes flags)
         {
             if (buf == null)
-                throw new ArgumentNullException("buf");
+                throw new ArgumentNullException(nameof(buf));
             IntPtr matPtr = NativeMethods.imgcodecs_imdecode_vector(
-                buf, new IntPtr(buf.LongLength), (int) flags);
+                buf, new IntPtr(buf.Length), (int) flags);
             return new Mat(matPtr);
         }
 
@@ -136,15 +138,16 @@ namespace OpenCvSharp
         public static bool ImEncode(string ext, InputArray img, out byte[] buf, int[] prms = null)
         {
             if (string.IsNullOrEmpty(ext))
-                throw new ArgumentNullException("ext");
+                throw new ArgumentNullException(nameof(ext));
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (prms == null)
                 prms = new int[0];
             img.ThrowIfDisposed();
-            using (VectorOfByte bufVec = new VectorOfByte())
+            using (var bufVec = new VectorOfByte())
             {
                 int ret = NativeMethods.imgcodecs_imencode_vector(ext, img.CvPtr, bufVec.CvPtr, prms, prms.Length);
+                GC.KeepAlive(img);
                 buf = bufVec.ToArray();
                 return ret != 0;
             }
@@ -161,7 +164,7 @@ namespace OpenCvSharp
         {
             if (prms != null)
             {
-                List<int> p = new List<int>();
+                var p = new List<int>();
                 foreach (ImageEncodingParam item in prms)
                 {
                     p.Add((int) item.EncodingId);
@@ -184,9 +187,9 @@ namespace OpenCvSharp
         public static void ConvertImage(Mat src, Mat dst, ConvertImageModes flags = ConvertImageModes.None)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null) 
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             
@@ -205,7 +208,7 @@ namespace OpenCvSharp
         public static bool HaveImageReader(string fileName)
         {
             if (fileName == null) 
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             return NativeMethods.imgcodecs_cvHaveImageReader(fileName) != 0;
         }
 
@@ -217,7 +220,7 @@ namespace OpenCvSharp
         public static bool HaveImageWriter(string fileName)
         {
             if (fileName == null) 
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             return NativeMethods.imgcodecs_cvHaveImageWriter(fileName) != 0;
         }
     }

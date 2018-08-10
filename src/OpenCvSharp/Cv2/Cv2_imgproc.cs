@@ -54,7 +54,8 @@ namespace OpenCvSharp
             var ktype0 = ktype.GetValueOrDefault(MatType.CV_32F);
             NativeMethods.imgproc_getDerivKernels(
                 kx.CvPtr, ky.CvPtr, dx, dy, ksize, normalize ? 1 : 0, ktype0);
-
+            GC.KeepAlive(kx);
+            GC.KeepAlive(ky);
             kx.Fix();
             ky.Fix();
         }
@@ -101,33 +102,7 @@ namespace OpenCvSharp
             return new Mat(matPtr);
         }
         #endregion
-        #region CopyMakeBorder
-        /// <summary>
-        /// Forms a border around the image
-        /// </summary>
-        /// <param name="src">The source image</param>
-        /// <param name="dst">The destination image; will have the same type as src and 
-        /// the size Size(src.cols+left+right, src.rows+top+bottom)</param>
-        /// <param name="top">Specify how much pixels in each direction from the source image rectangle one needs to extrapolate</param>
-        /// <param name="bottom">Specify how much pixels in each direction from the source image rectangle one needs to extrapolate</param>
-        /// <param name="left">Specify how much pixels in each direction from the source image rectangle one needs to extrapolate</param>
-        /// <param name="right">Specify how much pixels in each direction from the source image rectangle one needs to extrapolate</param>
-        /// <param name="borderType">The border type</param>
-        /// <param name="value">The border value if borderType == Constant</param>
-        public static void CopyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, BorderTypes borderType, Scalar? value = null)
-        {
-            if (src == null)
-                throw new ArgumentNullException("src");
-            if (dst == null)
-                throw new ArgumentNullException("dst");
-            src.ThrowIfDisposed();
-            dst.ThrowIfNotReady();
-            Scalar value0 = value.GetValueOrDefault(new Scalar());
-            NativeMethods.imgproc_copyMakeBorder(src.CvPtr, dst.CvPtr, top, bottom, left, right, (int)borderType, value0);
-            GC.KeepAlive(src);
-            dst.Fix();
-        }
-        #endregion
+
         #region MedianBlur
         /// <summary>
         /// Smoothes image using median filter
@@ -140,13 +115,14 @@ namespace OpenCvSharp
         public static void MedianBlur(InputArray src, OutputArray dst, int ksize)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_medianBlur(src.CvPtr, dst.CvPtr, ksize);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -176,6 +152,7 @@ namespace OpenCvSharp
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_GaussianBlur(src.CvPtr, dst.CvPtr, ksize, sigmaX, sigmaY, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -206,6 +183,7 @@ namespace OpenCvSharp
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_bilateralFilter(src.CvPtr, dst.CvPtr, d, sigmaColor, sigmaSpace, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -261,14 +239,15 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             Point anchor0 = anchor.GetValueOrDefault(new Point(-1, -1));
             NativeMethods.imgproc_boxFilter(src.CvPtr, dst.CvPtr, ddepth, ksize, anchor0, normalize ? 1 : 0, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -286,14 +265,15 @@ namespace OpenCvSharp
             Point? anchor = null, BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             Point anchor0 = anchor.GetValueOrDefault(new Point(-1, -1));
             NativeMethods.imgproc_blur(src.CvPtr, dst.CvPtr, ksize, anchor0, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -314,15 +294,15 @@ namespace OpenCvSharp
         /// <param name="borderType">The pixel extrapolation method</param>
         public static void Filter2D(
             InputArray src, OutputArray dst, MatType ddepth,
-	        InputArray kernel, Point? anchor = null, double delta = 0, 
+            InputArray kernel, Point? anchor = null, double delta = 0, 
             BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (kernel == null)
-                throw new ArgumentNullException("kernel");
+                throw new ArgumentNullException(nameof(kernel));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             kernel.ThrowIfDisposed();
@@ -330,6 +310,8 @@ namespace OpenCvSharp
             NativeMethods.imgproc_filter2D(src.CvPtr, dst.CvPtr, ddepth, kernel.CvPtr, 
                 anchor0, delta, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(kernel);
             dst.Fix();
         }
         #endregion
@@ -351,13 +333,13 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (kernelX == null)
-                throw new ArgumentNullException("kernelX");
+                throw new ArgumentNullException(nameof(kernelX));
             if (kernelY == null)
-                throw new ArgumentNullException("kernelY");
+                throw new ArgumentNullException(nameof(kernelY));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             kernelX.ThrowIfDisposed();
@@ -366,6 +348,9 @@ namespace OpenCvSharp
             NativeMethods.imgproc_sepFilter2D(src.CvPtr, dst.CvPtr, ddepth, 
                 kernelX.CvPtr, kernelY.CvPtr, anchor0, delta, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(kernelX);
+            GC.KeepAlive(kernelY);
             dst.Fix();
         }
         #endregion
@@ -388,14 +373,15 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Default)        
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_Sobel(src.CvPtr, dst.CvPtr, ddepth, xorder, yorder, 
                 ksize, scale, delta, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -416,14 +402,15 @@ namespace OpenCvSharp
             double scale = 1, double delta = 0, BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_Scharr(src.CvPtr, dst.CvPtr, ddepth, xorder, yorder, 
                 scale, delta, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -444,13 +431,14 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_Laplacian(src.CvPtr, dst.CvPtr, ddepth, ksize, scale, delta, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -480,13 +468,14 @@ namespace OpenCvSharp
             double threshold1, double threshold2, int apertureSize = 3, bool L2gradient = false)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (edges == null)
-                throw new ArgumentNullException("edges");
+                throw new ArgumentNullException(nameof(edges));
             src.ThrowIfDisposed();
             edges.ThrowIfNotReady();
             NativeMethods.imgproc_Canny(src.CvPtr, edges.CvPtr, threshold1, threshold2, apertureSize, L2gradient ? 1 : 0);
             GC.KeepAlive(src);
+            GC.KeepAlive(edges);
             edges.Fix();
         }
         #endregion
@@ -504,13 +493,14 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_cornerEigenValsAndVecs(src.CvPtr, dst.CvPtr, blockSize, ksize, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -526,13 +516,14 @@ namespace OpenCvSharp
             InputArray src, OutputArray dst, int ksize, BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_preCornerDetect(src.CvPtr, dst.CvPtr, ksize, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -554,9 +545,9 @@ namespace OpenCvSharp
             Size winSize, Size zeroZone, TermCriteria criteria)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (inputCorners == null)
-                throw new ArgumentNullException("inputCorners");
+                throw new ArgumentNullException(nameof(inputCorners));
             image.ThrowIfDisposed();
 
             var inputCornersSrc = EnumerableEx.ToArray(inputCorners);
@@ -595,7 +586,7 @@ namespace OpenCvSharp
             InputArray mask, int blockSize, bool useHarrisDetector, double k)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             src.ThrowIfDisposed();
 
             using (var vector = new VectorOfPoint2f())
@@ -604,6 +595,7 @@ namespace OpenCvSharp
                 NativeMethods.imgproc_goodFeaturesToTrack(src.CvPtr, vector.CvPtr, maxCorners, qualityLevel, 
                     minDistance, maskPtr, blockSize, useHarrisDetector ? 0 : 1, k);
                 GC.KeepAlive(src);
+                GC.KeepAlive(mask);
                 return vector.ToArray();
             }
         }
@@ -639,7 +631,7 @@ namespace OpenCvSharp
             double srn = 0, double stn = 0)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
 
             using (var vec = new VectorOfVec2f())
             {
@@ -678,7 +670,7 @@ namespace OpenCvSharp
             double minLineLength = 0, double maxLineGap = 0)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfDisposed();
             using (var vec = new VectorOfVec4i())
             {
@@ -721,7 +713,7 @@ namespace OpenCvSharp
             double param1 = 100, double param2 = 100, int minRadius = 0, int maxRadius = 0)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfDisposed();
             using (var vec = new VectorOfVec3f())
             {
@@ -771,9 +763,9 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Constant, Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
 
@@ -782,6 +774,8 @@ namespace OpenCvSharp
             IntPtr elementPtr = ToPtr(element);
             NativeMethods.imgproc_dilate(src.CvPtr, dst.CvPtr, elementPtr, anchor0, iterations, (int)borderType, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(element);
             dst.Fix();
         }
         #endregion
@@ -815,9 +809,9 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Constant, Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
 
@@ -826,6 +820,8 @@ namespace OpenCvSharp
             IntPtr elementPtr = ToPtr(element);
             NativeMethods.imgproc_erode(src.CvPtr, dst.CvPtr, elementPtr, anchor0, iterations, (int)borderType, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(element);
             dst.Fix();
         }
         #endregion
@@ -861,9 +857,9 @@ namespace OpenCvSharp
             BorderTypes borderType = BorderTypes.Constant, Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
 
@@ -872,6 +868,8 @@ namespace OpenCvSharp
             IntPtr elementPtr = ToPtr(element);
             NativeMethods.imgproc_morphologyEx(src.CvPtr, dst.CvPtr, (int)op, elementPtr, anchor0, iterations, (int)borderType, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(element);
             dst.Fix();
         }
         #endregion
@@ -894,13 +892,14 @@ namespace OpenCvSharp
             double fx = 0, double fy = 0, InterpolationFlags interpolation = InterpolationFlags.Linear)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_resize(src.CvPtr, dst.CvPtr, dsize, fx, fy, (int)interpolation);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -924,17 +923,19 @@ namespace OpenCvSharp
             BorderTypes borderMode = BorderTypes.Constant, Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (m == null)
-                throw new ArgumentNullException("m");
+                throw new ArgumentNullException(nameof(m));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             m.ThrowIfDisposed();
             Scalar borderValue0 = borderValue.GetValueOrDefault(Scalar.All(0));
             NativeMethods.imgproc_warpAffine(src.CvPtr, dst.CvPtr, m.CvPtr, dsize, (int)flags, (int)borderMode, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(m);
             dst.Fix();
         }
         #endregion
@@ -972,11 +973,11 @@ namespace OpenCvSharp
             Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (m == null)
-                throw new ArgumentNullException("m");
+                throw new ArgumentNullException(nameof(m));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             m.ThrowIfDisposed();
@@ -984,6 +985,8 @@ namespace OpenCvSharp
             NativeMethods.imgproc_warpPerspective_MisInputArray(
                 src.CvPtr, dst.CvPtr, m.CvPtr, dsize, (int)flags, (int)borderMode, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(m);
             dst.Fix();
         }
 
@@ -1020,11 +1023,11 @@ namespace OpenCvSharp
             Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (m == null)
-                throw new ArgumentNullException("m");
+                throw new ArgumentNullException(nameof(m));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             Scalar borderValue0 = borderValue.GetValueOrDefault(Scalar.All(0));
@@ -1033,6 +1036,7 @@ namespace OpenCvSharp
             NativeMethods.imgproc_warpPerspective_MisArray(
                 src.CvPtr, dst.CvPtr, m, mRow, mCol, dsize, (int)flags, (int)borderMode, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -1055,13 +1059,13 @@ namespace OpenCvSharp
             BorderTypes borderMode = BorderTypes.Constant, Scalar? borderValue = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (map1 == null)
-                throw new ArgumentNullException("map1");
+                throw new ArgumentNullException(nameof(map1));
             if (map2 == null)
-                throw new ArgumentNullException("map2");
+                throw new ArgumentNullException(nameof(map2));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             map1.ThrowIfDisposed();
@@ -1069,7 +1073,10 @@ namespace OpenCvSharp
             Scalar borderValue0 = borderValue.GetValueOrDefault(Scalar.All(0));
             NativeMethods.imgproc_remap(src.CvPtr, dst.CvPtr, map1.CvPtr, map2.CvPtr, (int)interpolation, (int)borderMode, borderValue0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
+            GC.KeepAlive(map1);
+            GC.KeepAlive(map2);
         }
         #endregion
         #region ConvertMaps
@@ -1085,13 +1092,13 @@ namespace OpenCvSharp
         public static void ConvertMaps(InputArray map1, InputArray map2, OutputArray dstmap1, OutputArray dstmap2, MatType dstmap1Type, bool nnInterpolation = false)
         {
             if (map1 == null)
-                throw new ArgumentNullException("map1");
+                throw new ArgumentNullException(nameof(map1));
             if (map2 == null)
-                throw new ArgumentNullException("map2");
+                throw new ArgumentNullException(nameof(map2));
             if (dstmap1 == null)
-                throw new ArgumentNullException("dstmap1");
+                throw new ArgumentNullException(nameof(dstmap1));
             if (dstmap2 == null)
-                throw new ArgumentNullException("dstmap2");
+                throw new ArgumentNullException(nameof(dstmap2));
             map1.ThrowIfDisposed();
             map2.ThrowIfDisposed();
             dstmap1.ThrowIfDisposed();
@@ -1099,6 +1106,8 @@ namespace OpenCvSharp
             NativeMethods.imgproc_convertMaps(map1.CvPtr, map2.CvPtr, dstmap1.CvPtr, dstmap2.CvPtr, dstmap1Type, nnInterpolation ? 1 : 0);
             GC.KeepAlive(map1);
             GC.KeepAlive(map2);
+            GC.KeepAlive(dstmap1);
+            GC.KeepAlive(dstmap2);
             dstmap1.Fix();
             dstmap2.Fix();
         }
@@ -1128,13 +1137,14 @@ namespace OpenCvSharp
         public static void InvertAffineTransform(InputArray m, OutputArray im)
         {
             if (m == null)
-                throw new ArgumentNullException("m");
+                throw new ArgumentNullException(nameof(m));
             if (im == null)
-                throw new ArgumentNullException("im");
+                throw new ArgumentNullException(nameof(im));
             m.ThrowIfDisposed();
             im.ThrowIfNotReady();
             NativeMethods.imgproc_invertAffineTransform(m.CvPtr, im.CvPtr);
             GC.KeepAlive(m);
+            GC.KeepAlive(im);
             im.Fix();
         }
         #endregion
@@ -1148,9 +1158,9 @@ namespace OpenCvSharp
         public static Mat GetPerspectiveTransform(IEnumerable<Point2f> src, IEnumerable<Point2f> dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             Point2f[] srcArray = EnumerableEx.ToArray(src);
             Point2f[] dstArray = EnumerableEx.ToArray(dst);
             IntPtr ret = NativeMethods.imgproc_getPerspectiveTransform1(srcArray, dstArray);
@@ -1165,9 +1175,9 @@ namespace OpenCvSharp
         public static Mat GetPerspectiveTransform(InputArray src, InputArray dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             IntPtr ret = NativeMethods.imgproc_getPerspectiveTransform2(src.CvPtr, dst.CvPtr);
@@ -1186,9 +1196,9 @@ namespace OpenCvSharp
         public static Mat GetAffineTransform(IEnumerable<Point2f> src, IEnumerable<Point2f> dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             Point2f[] srcArray = EnumerableEx.ToArray(src);
             Point2f[] dstArray = EnumerableEx.ToArray(dst);
             IntPtr ret = NativeMethods.imgproc_getAffineTransform1(srcArray, dstArray);
@@ -1204,9 +1214,9 @@ namespace OpenCvSharp
         public static Mat GetAffineTransform(InputArray src, InputArray dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfDisposed();
             IntPtr ret = NativeMethods.imgproc_getAffineTransform2(src.CvPtr, dst.CvPtr);
@@ -1236,7 +1246,8 @@ namespace OpenCvSharp
             image.ThrowIfDisposed();
             patch.ThrowIfNotReady();
             NativeMethods.imgproc_getRectSubPix(image.CvPtr, patchSize, center, patch.CvPtr, patchType);
-            GC.KeepAlive(image); 
+            GC.KeepAlive(image);
+            GC.KeepAlive(patch);
             patch.Fix();
         }
         #endregion
@@ -1263,6 +1274,7 @@ namespace OpenCvSharp
             NativeMethods.imgproc_logPolar(src.CvPtr, dst.CvPtr, center, m, (int)flags);
 
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
 
@@ -1288,6 +1300,7 @@ namespace OpenCvSharp
             NativeMethods.imgproc_linearPolar(src.CvPtr, dst.CvPtr, center, maxRadius, (int)flags);
 
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
 
@@ -1301,13 +1314,14 @@ namespace OpenCvSharp
         public static void Integral(InputArray src, OutputArray sum, int sdepth = -1)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (sum == null)
-                throw new ArgumentNullException("sum");
+                throw new ArgumentNullException(nameof(sum));
             src.ThrowIfDisposed();
             sum.ThrowIfNotReady();
             NativeMethods.imgproc_integral1(src.CvPtr, sum.CvPtr, sdepth);
             GC.KeepAlive(src);
+            GC.KeepAlive(sum);
             sum.Fix();
         }
         /// <summary>
@@ -1320,16 +1334,18 @@ namespace OpenCvSharp
         public static void Integral(InputArray src, OutputArray sum, OutputArray sqsum, int sdepth = -1)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (sum == null)
-                throw new ArgumentNullException("sum");
+                throw new ArgumentNullException(nameof(sum));
             if (sqsum == null)
-                throw new ArgumentNullException("sqsum");
+                throw new ArgumentNullException(nameof(sqsum));
             src.ThrowIfDisposed();
             sum.ThrowIfNotReady();
             sqsum.ThrowIfNotReady();
             NativeMethods.imgproc_integral2(src.CvPtr, sum.CvPtr, sqsum.CvPtr, sdepth);
             GC.KeepAlive(src);
+            GC.KeepAlive(sum);
+            GC.KeepAlive(sqsum);
             sum.Fix();
             sqsum.Fix();
         }
@@ -1344,19 +1360,22 @@ namespace OpenCvSharp
         public static void Integral(InputArray src, OutputArray sum, OutputArray sqsum, OutputArray tilted, int sdepth = -1)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (sum == null)
-                throw new ArgumentNullException("sum");
+                throw new ArgumentNullException(nameof(sum));
             if (sqsum == null)
-                throw new ArgumentNullException("sqsum");
+                throw new ArgumentNullException(nameof(sqsum));
             if (tilted == null)
-                throw new ArgumentNullException("tilted");
+                throw new ArgumentNullException(nameof(tilted));
             src.ThrowIfDisposed();
             sum.ThrowIfNotReady();
             sqsum.ThrowIfNotReady();
             tilted.ThrowIfNotReady();
             NativeMethods.imgproc_integral3(src.CvPtr, sum.CvPtr, sqsum.CvPtr, tilted.CvPtr, sdepth);
             GC.KeepAlive(src);
+            GC.KeepAlive(sum);
+            GC.KeepAlive(sqsum);
+            GC.KeepAlive(tilted);
             sum.Fix();
             sqsum.Fix();
             tilted.Fix();
@@ -1372,13 +1391,15 @@ namespace OpenCvSharp
         public static void Accumulate(InputArray src, InputOutputArray dst, InputArray mask)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_accumulate(src.CvPtr, dst.CvPtr, ToPtr(mask));
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(mask);
             dst.Fix();
         }
         /// <summary>
@@ -1390,13 +1411,15 @@ namespace OpenCvSharp
         public static void AccumulateSquare(InputArray src, InputOutputArray dst, InputArray mask)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_accumulateSquare(src.CvPtr, dst.CvPtr, ToPtr(mask));
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(mask);
             dst.Fix();
         }
         /// <summary>
@@ -1409,17 +1432,19 @@ namespace OpenCvSharp
         public static void AccumulateProduct(InputArray src1, InputArray src2, InputOutputArray dst, InputArray mask)
         {
             if (src1 == null)
-                throw new ArgumentNullException("src1");
+                throw new ArgumentNullException(nameof(src1));
             if (src2 == null)
-                throw new ArgumentNullException("src2");
+                throw new ArgumentNullException(nameof(src2));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src1.ThrowIfDisposed();
             src2.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_accumulateProduct(src1.CvPtr, src2.CvPtr, dst.CvPtr, ToPtr(mask));
             GC.KeepAlive(src1);
             GC.KeepAlive(src2);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(mask);
             dst.Fix();
         }
         /// <summary>
@@ -1432,13 +1457,15 @@ namespace OpenCvSharp
         public static void AccumulateWeighted(InputArray src, InputOutputArray dst, double alpha, InputArray mask)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_accumulateWeighted(src.CvPtr, dst.CvPtr, alpha, ToPtr(mask));
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(mask);
             dst.Fix();
         }
         #endregion
@@ -1453,9 +1480,9 @@ namespace OpenCvSharp
         public static double PSNR(InputArray src1, InputArray src2)
         {
             if (src1 == null)
-                throw new ArgumentNullException("src1");
+                throw new ArgumentNullException(nameof(src1));
             if (src2 == null)
-                throw new ArgumentNullException("src2");
+                throw new ArgumentNullException(nameof(src2));
             src1.ThrowIfDisposed();
             src2.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_PSNR(src1.CvPtr, src2.CvPtr);
@@ -1476,14 +1503,15 @@ namespace OpenCvSharp
                                              InputArray window = null)
         {
             if (src1 == null)
-                throw new ArgumentNullException("src1");
+                throw new ArgumentNullException(nameof(src1));
             if (src2 == null)
-                throw new ArgumentNullException("src2");
+                throw new ArgumentNullException(nameof(src2));
             src1.ThrowIfDisposed();
             src2.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_phaseCorrelate(src1.CvPtr, src2.CvPtr, ToPtr(window));
             GC.KeepAlive(src1);
             GC.KeepAlive(src2);
+            GC.KeepAlive(window);
             return ret;
         }
         #endregion
@@ -1512,11 +1540,11 @@ namespace OpenCvSharp
                                                 InputArray window, out double response)
         {
             if (src1 == null)
-                throw new ArgumentNullException("src1");
+                throw new ArgumentNullException(nameof(src1));
             if (src2 == null)
-                throw new ArgumentNullException("src2");
+                throw new ArgumentNullException(nameof(src2));
             if (window == null)
-                throw new ArgumentNullException("src2");
+                throw new ArgumentNullException(nameof(src2));
             src1.ThrowIfDisposed();
             src2.ThrowIfDisposed();
             window.ThrowIfDisposed();
@@ -1537,9 +1565,10 @@ namespace OpenCvSharp
         public static void CreateHanningWindow(InputOutputArray dst, Size winSize, MatType type)
         {
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_createHanningWindow(dst.CvPtr, winSize, type);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -1556,13 +1585,14 @@ namespace OpenCvSharp
         public static double Threshold(InputArray src, OutputArray dst, double thresh, double maxval, ThresholdTypes type)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             double ret = NativeMethods.imgproc_threshold(src.CvPtr, dst.CvPtr, thresh, maxval, (int)type);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
             return ret;
         }
@@ -1583,13 +1613,14 @@ namespace OpenCvSharp
             double maxValue, AdaptiveThresholdTypes adaptiveMethod, ThresholdTypes thresholdType, int blockSize, double c)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_adaptiveThreshold(src.CvPtr, dst.CvPtr, maxValue, (int)adaptiveMethod, (int)thresholdType, blockSize, c);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -1605,14 +1636,15 @@ namespace OpenCvSharp
             Size? dstSize = null, BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             Size dstSize0 = dstSize.GetValueOrDefault(new Size());
             NativeMethods.imgproc_pyrDown(src.CvPtr, dst.CvPtr, dstSize0, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         /// <summary>
@@ -1626,14 +1658,15 @@ namespace OpenCvSharp
             Size? dstSize = null, BorderTypes borderType = BorderTypes.Default)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             Size dstSize0 = dstSize.GetValueOrDefault(new Size());
             NativeMethods.imgproc_pyrUp(src.CvPtr, dst.CvPtr, dstSize0, (int)borderType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -1655,17 +1688,21 @@ namespace OpenCvSharp
             InputArray newCameraMatrix = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (cameraMatrix == null)
-                throw new ArgumentNullException("cameraMatrix");
+                throw new ArgumentNullException(nameof(cameraMatrix));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             cameraMatrix.ThrowIfDisposed();
             NativeMethods.imgproc_undistort(src.CvPtr, dst.CvPtr, cameraMatrix.CvPtr,
                 ToPtr(distCoeffs), ToPtr(newCameraMatrix));
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(cameraMatrix);
+            GC.KeepAlive(distCoeffs);
+            GC.KeepAlive(newCameraMatrix);
             dst.Fix();
         }
         #endregion
@@ -1687,17 +1724,17 @@ namespace OpenCvSharp
             Size size, MatType m1Type, OutputArray map1, OutputArray map2)
         {
             if (cameraMatrix == null)
-                throw new ArgumentNullException("cameraMatrix");
+                throw new ArgumentNullException(nameof(cameraMatrix));
             if (distCoeffs == null)
-                throw new ArgumentNullException("distCoeffs");
+                throw new ArgumentNullException(nameof(distCoeffs));
             if (r == null)
-                throw new ArgumentNullException("r");
+                throw new ArgumentNullException(nameof(r));
             if (newCameraMatrix == null)
-                throw new ArgumentNullException("newCameraMatrix");
+                throw new ArgumentNullException(nameof(newCameraMatrix));
             if (map1 == null)
-                throw new ArgumentNullException("map1");
+                throw new ArgumentNullException(nameof(map1));
             if (map2 == null)
-                throw new ArgumentNullException("map2");
+                throw new ArgumentNullException(nameof(map2));
             cameraMatrix.ThrowIfDisposed();
             distCoeffs.ThrowIfDisposed();
             r.ThrowIfDisposed();
@@ -1710,6 +1747,8 @@ namespace OpenCvSharp
             GC.KeepAlive(distCoeffs);
             GC.KeepAlive(r);
             GC.KeepAlive(newCameraMatrix);
+            GC.KeepAlive(map1);
+            GC.KeepAlive(map2);
             map1.Fix();
             map2.Fix();
         }
@@ -1735,13 +1774,13 @@ namespace OpenCvSharp
             ProjectionType projType, double alpha = 0)
         {
             if (cameraMatrix == null)
-                throw new ArgumentNullException("cameraMatrix");
+                throw new ArgumentNullException(nameof(cameraMatrix));
             if (distCoeffs == null)
-                throw new ArgumentNullException("distCoeffs");
+                throw new ArgumentNullException(nameof(distCoeffs));
             if (map1 == null)
-                throw new ArgumentNullException("map1");
+                throw new ArgumentNullException(nameof(map1));
             if (map2 == null)
-                throw new ArgumentNullException("map2");
+                throw new ArgumentNullException(nameof(map2));
             cameraMatrix.ThrowIfDisposed();
             distCoeffs.ThrowIfDisposed();
             map1.ThrowIfNotReady();
@@ -1750,6 +1789,8 @@ namespace OpenCvSharp
                 destImageWidth, m1Type, map1.CvPtr, map2.CvPtr, (int)projType, alpha);
             GC.KeepAlive(cameraMatrix);
             GC.KeepAlive(distCoeffs);
+            GC.KeepAlive(map1);
+            GC.KeepAlive(map2);
             map1.Fix();
             map2.Fix();
             return ret;
@@ -1769,7 +1810,7 @@ namespace OpenCvSharp
             InputArray cameraMatrix, Size? imgSize = null, bool centerPrincipalPoint = false)
         {
             if (cameraMatrix == null)
-                throw new ArgumentNullException("cameraMatrix");
+                throw new ArgumentNullException(nameof(cameraMatrix));
             cameraMatrix.ThrowIfDisposed();
             Size imgSize0 = imgSize.GetValueOrDefault(new Size());
             IntPtr matPtr = NativeMethods.imgproc_getDefaultNewCameraMatrix(cameraMatrix.CvPtr, imgSize0, centerPrincipalPoint ? 1 : 0);
@@ -1799,18 +1840,20 @@ namespace OpenCvSharp
             InputArray r = null, InputArray p = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (cameraMatrix == null)
-                throw new ArgumentNullException("cameraMatrix");
+                throw new ArgumentNullException(nameof(cameraMatrix));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             cameraMatrix.ThrowIfDisposed();
             NativeMethods.imgproc_undistortPoints(src.CvPtr, dst.CvPtr, cameraMatrix.CvPtr, 
                 ToPtr(distCoeffs), ToPtr(r), ToPtr(p));
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             GC.KeepAlive(cameraMatrix);
+            GC.KeepAlive(distCoeffs);
             GC.KeepAlive(r);
             GC.KeepAlive(p);
             dst.Fix();
@@ -1835,7 +1878,7 @@ namespace OpenCvSharp
             Rangef[] ranges, bool uniform = true, bool accumulate = false)
         {
             if (ranges == null)
-                throw new ArgumentNullException("ranges");
+                throw new ArgumentNullException(nameof(ranges));
             float[][] rangesFloat = EnumerableEx.SelectToArray(
                 ranges, r => new [] {r.Start, r.End});
             CalcHist(images, channels, mask, hist, dims, 
@@ -1860,15 +1903,15 @@ namespace OpenCvSharp
             float[][] ranges, bool uniform = true, bool accumulate = false)
         {
             if (images == null)
-                throw new ArgumentNullException("images");
+                throw new ArgumentNullException(nameof(images));
             if (channels == null)
-                throw new ArgumentNullException("channels");
+                throw new ArgumentNullException(nameof(channels));
             if (hist == null)
-                throw new ArgumentNullException("hist");
+                throw new ArgumentNullException(nameof(hist));
             if (histSize == null)
-                throw new ArgumentNullException("histSize");
+                throw new ArgumentNullException(nameof(histSize));
             if (ranges == null)
-                throw new ArgumentNullException("ranges");
+                throw new ArgumentNullException(nameof(ranges));
             hist.ThrowIfNotReady();
 
             IntPtr[] imagesPtr = EnumerableEx.SelectPtrs(images);
@@ -1879,6 +1922,7 @@ namespace OpenCvSharp
             }
             GC.KeepAlive(images);
             GC.KeepAlive(mask);
+            GC.KeepAlive(hist);
             hist.Fix();
         }
         #endregion
@@ -1897,15 +1941,15 @@ namespace OpenCvSharp
             Rangef[] ranges, bool uniform = true)
         {
             if (images == null)
-                throw new ArgumentNullException("images");
+                throw new ArgumentNullException(nameof(images));
             if (channels == null)
-                throw new ArgumentNullException("channels");
+                throw new ArgumentNullException(nameof(channels));
             if (hist == null)
-                throw new ArgumentNullException("hist");
+                throw new ArgumentNullException(nameof(hist));
             if (backProject == null)
-                throw new ArgumentNullException("backProject");
+                throw new ArgumentNullException(nameof(backProject));
             if (ranges == null)
-                throw new ArgumentNullException("ranges");
+                throw new ArgumentNullException(nameof(ranges));
             hist.ThrowIfDisposed();
             backProject.ThrowIfNotReady();
 
@@ -1919,6 +1963,7 @@ namespace OpenCvSharp
             }
             GC.KeepAlive(images);
             GC.KeepAlive(hist);
+            GC.KeepAlive(backProject);
             backProject.Fix();
         }
         #endregion
@@ -1933,9 +1978,9 @@ namespace OpenCvSharp
         public static double CompareHist(InputArray h1, InputArray h2, HistCompMethods method)
         {
             if (h1 == null)
-                throw new ArgumentNullException("h1");
+                throw new ArgumentNullException(nameof(h1));
             if (h2 == null)
-                throw new ArgumentNullException("h2");
+                throw new ArgumentNullException(nameof(h2));
             h1.ThrowIfDisposed();
             h2.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_compareHist1(h1.CvPtr, h2.CvPtr, (int)method);
@@ -1953,13 +1998,14 @@ namespace OpenCvSharp
         public static void EqualizeHist(InputArray src, OutputArray dst)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_equalizeHist(src.CvPtr, dst.CvPtr);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -2031,16 +2077,17 @@ namespace OpenCvSharp
             DistanceTypes distType, InputArray cost, out float lowerBound, OutputArray flow)
         {
             if (signature1 == null)
-                throw new ArgumentNullException("signature1");
+                throw new ArgumentNullException(nameof(signature1));
             if (signature2 == null)
-                throw new ArgumentNullException("signature2");
+                throw new ArgumentNullException(nameof(signature2));
             signature1.ThrowIfDisposed();
             signature2.ThrowIfDisposed();
             float ret = NativeMethods.imgproc_EMD(signature1.CvPtr, signature2.CvPtr, (int)distType, ToPtr(cost), out lowerBound, ToPtr(flow));
             GC.KeepAlive(signature1);
             GC.KeepAlive(signature2);
             GC.KeepAlive(cost);
-            if(flow != null)
+            GC.KeepAlive(flow);
+            if (flow != null)
                 flow.Fix();
             return ret;
         }
@@ -2055,13 +2102,14 @@ namespace OpenCvSharp
         public static void Watershed(InputArray image, InputOutputArray markers)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (markers == null)
-                throw new ArgumentNullException("markers");
+                throw new ArgumentNullException(nameof(markers));
             image.ThrowIfDisposed();
             markers.ThrowIfNotReady();
             NativeMethods.imgproc_watershed(image.CvPtr, markers.CvPtr);
             GC.KeepAlive(image);
+            GC.KeepAlive(markers);
             markers.Fix();
         }
         #endregion
@@ -2079,15 +2127,16 @@ namespace OpenCvSharp
             double sp, double sr, int maxLevel = 1, TermCriteria? termcrit = null)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             TermCriteria termcrit0 = termcrit.GetValueOrDefault(
                 new TermCriteria(CriteriaType.Count | CriteriaType.Eps, 5, 1));
             NativeMethods.imgproc_pyrMeanShiftFiltering(src.CvPtr, dst.CvPtr, sp, sr, maxLevel, termcrit0);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -2111,13 +2160,13 @@ namespace OpenCvSharp
                                    int iterCount, GrabCutModes mode)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (mask == null)
-                throw new ArgumentNullException("mask");
+                throw new ArgumentNullException(nameof(mask));
             if (bgdModel == null)
-                throw new ArgumentNullException("bgdModel");
+                throw new ArgumentNullException(nameof(bgdModel));
             if (fgdModel == null)
-                throw new ArgumentNullException("fgdModel");
+                throw new ArgumentNullException(nameof(fgdModel));
             img.ThrowIfDisposed();
             mask.ThrowIfNotReady();
             bgdModel.ThrowIfNotReady();
@@ -2125,6 +2174,9 @@ namespace OpenCvSharp
             NativeMethods.imgproc_grabCut(img.CvPtr, mask.CvPtr, rect,
                 bgdModel.CvPtr, fgdModel.CvPtr, iterCount, (int)mode);
             GC.KeepAlive(img);
+            GC.KeepAlive(mask);
+            GC.KeepAlive(bgdModel);
+            GC.KeepAlive(fgdModel);
             mask.Fix();
             bgdModel.Fix();
             fgdModel.Fix();
@@ -2148,17 +2200,19 @@ namespace OpenCvSharp
                                                        DistanceTransformLabelTypes labelType = DistanceTransformLabelTypes.CComp)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             if (labels == null)
-                throw new ArgumentNullException("labels");
+                throw new ArgumentNullException(nameof(labels));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             labels.ThrowIfNotReady();
             NativeMethods.imgproc_distanceTransformWithLabels(
                 src.CvPtr, dst.CvPtr, labels.CvPtr, (int)distanceType, (int)maskSize, (int)labelType);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
+            GC.KeepAlive(labels);
             dst.Fix();
             labels.Fix();
         }
@@ -2176,14 +2230,15 @@ namespace OpenCvSharp
                                              DistanceMaskSize maskSize)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_distanceTransform(
                 src.CvPtr, dst.CvPtr, (int)distanceType, (int)maskSize);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -2200,8 +2255,9 @@ namespace OpenCvSharp
         public static int FloodFill(InputOutputArray image, Point seedPoint, Scalar newVal)
         {
             Rect rect;
-            return FloodFill(image, seedPoint, newVal, out rect);
+            return FloodFill(image, seedPoint, newVal, out rect, null, null, FloodFillFlags.Link4);
         }
+
         /// <summary>
         /// Fills a connected component with the given color.
         /// </summary>
@@ -2227,13 +2283,42 @@ namespace OpenCvSharp
                                     Scalar? loDiff = null, Scalar? upDiff = null,
                                     FloodFillFlags flags = FloodFillFlags.Link4)
         {
+            return FloodFill(image, seedPoint, newVal, out rect, loDiff, upDiff, (int)flags);
+        }
+
+        /// <summary>
+        /// Fills a connected component with the given color.
+        /// </summary>
+        /// <param name="image">Input/output 1- or 3-channel, 8-bit, or floating-point image. 
+        /// It is modified by the function unless the FLOODFILL_MASK_ONLY flag is set in the 
+        /// second variant of the function. See the details below.</param>
+        /// <param name="seedPoint">Starting point.</param>
+        /// <param name="newVal">New value of the repainted domain pixels.</param>
+        /// <param name="rect">Optional output parameter set by the function to the 
+        /// minimum bounding rectangle of the repainted domain.</param>
+        /// <param name="loDiff">Maximal lower brightness/color difference between the currently 
+        /// observed pixel and one of its neighbors belonging to the component, or a seed pixel 
+        /// being added to the component.</param>
+        /// <param name="upDiff">Maximal upper brightness/color difference between the currently 
+        /// observed pixel and one of its neighbors belonging to the component, or a seed pixel 
+        /// being added to the component.</param>
+        /// <param name="flags">Operation flags. Lower bits contain a connectivity value, 
+        /// 4 (default) or 8, used within the function. Connectivity determines which 
+        /// neighbors of a pixel are considered. </param>
+        /// <returns></returns>
+        public static int FloodFill(InputOutputArray image,
+                                    Point seedPoint, Scalar newVal, out Rect rect,
+                                    Scalar? loDiff = null, Scalar? upDiff = null,
+                                    int flags = 4)
+        {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfNotReady();
             Scalar loDiff0 = loDiff.GetValueOrDefault(new Scalar());
             Scalar upDiff0 = upDiff.GetValueOrDefault(new Scalar());
-            int ret = NativeMethods.imgproc_floodFill(image.CvPtr, seedPoint, newVal, out rect,
+            int ret = NativeMethods.imgproc_floodFill1(image.CvPtr, seedPoint, newVal, out rect,
                 loDiff0, upDiff0, (int)flags);
+            GC.KeepAlive(image);
             image.Fix();
             return ret;
         }
@@ -2256,7 +2341,7 @@ namespace OpenCvSharp
                                     Point seedPoint, Scalar newVal)
         {
             Rect rect;
-            return FloodFill(image, mask, seedPoint, newVal, out rect);
+            return FloodFill(image, mask, seedPoint, newVal, out rect, null, null, FloodFillFlags.Link4);
         }
 
         /// <summary>
@@ -2289,16 +2374,51 @@ namespace OpenCvSharp
                                     Scalar? loDiff = null, Scalar? upDiff = null,
                                     FloodFillFlags flags = FloodFillFlags.Link4)
         {
+            return FloodFill(image, mask, seedPoint, newVal, out rect, loDiff, upDiff, (int)flags);
+        }
+
+        /// <summary>
+        /// Fills a connected component with the given color.
+        /// </summary>
+        /// <param name="image">Input/output 1- or 3-channel, 8-bit, or floating-point image. 
+        /// It is modified by the function unless the FLOODFILL_MASK_ONLY flag is set in the 
+        /// second variant of the function. See the details below.</param>
+        /// <param name="mask">(For the second function only) Operation mask that should be a single-channel 8-bit image, 
+        /// 2 pixels wider and 2 pixels taller. The function uses and updates the mask, so you take responsibility of 
+        /// initializing the mask content. Flood-filling cannot go across non-zero pixels in the mask. For example, 
+        /// an edge detector output can be used as a mask to stop filling at edges. It is possible to use the same mask 
+        /// in multiple calls to the function to make sure the filled area does not overlap.</param>
+        /// <param name="seedPoint">Starting point.</param>
+        /// <param name="newVal">New value of the repainted domain pixels.</param>
+        /// <param name="rect">Optional output parameter set by the function to the 
+        /// minimum bounding rectangle of the repainted domain.</param>
+        /// <param name="loDiff">Maximal lower brightness/color difference between the currently 
+        /// observed pixel and one of its neighbors belonging to the component, or a seed pixel 
+        /// being added to the component.</param>
+        /// <param name="upDiff">Maximal upper brightness/color difference between the currently 
+        /// observed pixel and one of its neighbors belonging to the component, or a seed pixel 
+        /// being added to the component.</param>
+        /// <param name="flags">Operation flags. Lower bits contain a connectivity value, 
+        /// 4 (default) or 8, used within the function. Connectivity determines which 
+        /// neighbors of a pixel are considered. </param>
+        /// <returns></returns>
+        public static int FloodFill(InputOutputArray image, InputOutputArray mask,
+                                    Point seedPoint, Scalar newVal, out Rect rect,
+                                    Scalar? loDiff = null, Scalar? upDiff = null,
+                                    int flags = 4)
+        {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (mask == null)
-                throw new ArgumentNullException("mask");
+                throw new ArgumentNullException(nameof(mask));
             image.ThrowIfNotReady();
             mask.ThrowIfNotReady();
             Scalar loDiff0 = loDiff.GetValueOrDefault(new Scalar());
             Scalar upDiff0 = upDiff.GetValueOrDefault(new Scalar());
-            int ret = NativeMethods.imgproc_floodFill(image.CvPtr, mask.CvPtr, seedPoint, 
-                newVal, out rect, loDiff0, upDiff0, (int)flags);
+            int ret = NativeMethods.imgproc_floodFill2(image.CvPtr, mask.CvPtr, seedPoint,
+                newVal, out rect, loDiff0, upDiff0, flags);
+            GC.KeepAlive(image);
+            GC.KeepAlive(mask);
             image.Fix();
             mask.Fix();
             return ret;
@@ -2325,14 +2445,15 @@ namespace OpenCvSharp
         public static void CvtColor(InputArray src, OutputArray dst, ColorConversionCodes code, int dstCn = 0)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             
             NativeMethods.imgproc_cvtColor(src.CvPtr, dst.CvPtr, (int)code, dstCn);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
         #endregion
@@ -2417,11 +2538,11 @@ namespace OpenCvSharp
             InputArray mask = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (templ == null)
-                throw new ArgumentNullException("templ");
+                throw new ArgumentNullException(nameof(templ));
             if (result == null)
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             image.ThrowIfDisposed();
             templ.ThrowIfDisposed();
             result.ThrowIfNotReady();
@@ -2430,6 +2551,7 @@ namespace OpenCvSharp
             NativeMethods.imgproc_matchTemplate(image.CvPtr, templ.CvPtr, result.CvPtr, (int)method, ToPtr(mask));
             GC.KeepAlive(image);
             GC.KeepAlive(templ);
+            GC.KeepAlive(result);
             result.Fix();
             GC.KeepAlive(mask);
         }
@@ -2469,9 +2591,9 @@ namespace OpenCvSharp
             PixelConnectivity connectivity, MatType ltype)
         {
             if (image == null) 
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (labels == null) 
-                throw new ArgumentNullException("labels");
+                throw new ArgumentNullException(nameof(labels));
             image.ThrowIfDisposed();
             labels.ThrowIfNotReady();
 
@@ -2479,6 +2601,7 @@ namespace OpenCvSharp
                 image.CvPtr, labels.CvPtr, (int)connectivity, ltype);
 
             GC.KeepAlive(image);
+            GC.KeepAlive(labels);
             labels.Fix();
             return result;
         }
@@ -2555,13 +2678,13 @@ namespace OpenCvSharp
             MatType ltype)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (labels == null)
-                throw new ArgumentNullException("labels");
+                throw new ArgumentNullException(nameof(labels));
             if (stats == null)
-                throw new ArgumentNullException("stats");
+                throw new ArgumentNullException(nameof(stats));
             if (centroids == null)
-                throw new ArgumentNullException("centroids");
+                throw new ArgumentNullException(nameof(centroids));
             image.ThrowIfDisposed();
             labels.ThrowIfNotReady();
             stats.ThrowIfNotReady();
@@ -2571,6 +2694,9 @@ namespace OpenCvSharp
                 image.CvPtr, labels.CvPtr, stats.CvPtr, centroids.CvPtr, (int) connectivity, ltype);
 
             GC.KeepAlive(image);
+            GC.KeepAlive(labels);
+            GC.KeepAlive(stats);
+            GC.KeepAlive(centroids);
             labels.Fix();
             stats.Fix();
             centroids.Fix();
@@ -2659,7 +2785,7 @@ namespace OpenCvSharp
             out HierarchyIndex[] hierarchy, RetrievalModes mode, ContourApproximationModes method, Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfNotReady();
 
             Point offset0 = offset.GetValueOrDefault(new Point());
@@ -2674,6 +2800,7 @@ namespace OpenCvSharp
                 hierarchy = EnumerableEx.SelectToArray(hierarchyOrg, HierarchyIndex.FromVec4i);
             }
             image.Fix();
+            GC.KeepAlive(image);
         }
 #if LANG_JP
         /// <summary>
@@ -2711,9 +2838,9 @@ namespace OpenCvSharp
             OutputArray hierarchy, RetrievalModes mode, ContourApproximationModes method, Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (hierarchy == null)
-                throw new ArgumentNullException("hierarchy");
+                throw new ArgumentNullException(nameof(hierarchy));
             image.ThrowIfNotReady();
             hierarchy.ThrowIfNotReady();
 
@@ -2727,6 +2854,8 @@ namespace OpenCvSharp
             }
             image.Fix();
             hierarchy.Fix();
+            GC.KeepAlive(image);
+            GC.KeepAlive(hierarchy);
         }
 
 #if LANG_JP
@@ -2756,13 +2885,14 @@ namespace OpenCvSharp
             RetrievalModes mode, ContourApproximationModes method, Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfNotReady();
 
             Point offset0 = offset.GetValueOrDefault(new Point());
             IntPtr contoursPtr;
             NativeMethods.imgproc_findContours2_vector(image.CvPtr, out contoursPtr, (int)mode, (int)method, offset0);
             image.Fix();
+            GC.KeepAlive(image);
 
             using (var contoursVec = new VectorOfVectorPoint(contoursPtr))
             {
@@ -2796,13 +2926,14 @@ namespace OpenCvSharp
             RetrievalModes mode, ContourApproximationModes method, Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             image.ThrowIfNotReady();
 
             Point offset0 = offset.GetValueOrDefault(new Point());
             IntPtr contoursPtr;
             NativeMethods.imgproc_findContours2_OutputArray(image.CvPtr, out contoursPtr, (int)mode, (int)method, offset0);
             image.Fix();
+            GC.KeepAlive(image);
 
             using (var contoursVec = new VectorOfMat(contoursPtr))
             {
@@ -2826,13 +2957,14 @@ namespace OpenCvSharp
         public static void ApproxPolyDP(InputArray curve, OutputArray approxCurve, double epsilon, bool closed)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             if (approxCurve == null)
-                throw new ArgumentNullException("approxCurve");
+                throw new ArgumentNullException(nameof(approxCurve));
             curve.ThrowIfDisposed();
             approxCurve.ThrowIfNotReady();
             NativeMethods.imgproc_approxPolyDP_InputArray(curve.CvPtr, approxCurve.CvPtr, epsilon, closed ? 1 : 0);
             GC.KeepAlive(curve);
+            GC.KeepAlive(approxCurve);
             approxCurve.Fix();
         }
         /// <summary>
@@ -2848,7 +2980,7 @@ namespace OpenCvSharp
         public static Point[] ApproxPolyDP(IEnumerable<Point> curve, double epsilon, bool closed)
         {
             if(curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point[] curveArray = EnumerableEx.ToArray(curve);
             IntPtr approxCurvePtr;
             NativeMethods.imgproc_approxPolyDP_Point(curveArray, curveArray.Length, out approxCurvePtr, epsilon, closed ? 1 : 0);
@@ -2870,7 +3002,7 @@ namespace OpenCvSharp
         public static Point2f[] ApproxPolyDP(IEnumerable<Point2f> curve, double epsilon, bool closed)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point2f[] curveArray = EnumerableEx.ToArray(curve);
             IntPtr approxCurvePtr;
             NativeMethods.imgproc_approxPolyDP_Point2f(curveArray, curveArray.Length, out approxCurvePtr, epsilon, closed ? 1 : 0);
@@ -2890,7 +3022,7 @@ namespace OpenCvSharp
         public static double ArcLength(InputArray curve, bool closed)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             curve.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_arcLength_InputArray(curve.CvPtr, closed ? 1 : 0);
             GC.KeepAlive(curve);
@@ -2906,7 +3038,7 @@ namespace OpenCvSharp
         public static double ArcLength(IEnumerable<Point> curve, bool closed)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point[] curveArray = EnumerableEx.ToArray(curve);
             return NativeMethods.imgproc_arcLength_Point(curveArray, curveArray.Length, closed ? 1 : 0);
         }
@@ -2920,7 +3052,7 @@ namespace OpenCvSharp
         public static double ArcLength(IEnumerable<Point2f> curve, bool closed)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point2f[] curveArray = EnumerableEx.ToArray(curve);
             return NativeMethods.imgproc_arcLength_Point2f(curveArray, curveArray.Length, closed ? 1 : 0);
         }
@@ -2934,7 +3066,7 @@ namespace OpenCvSharp
         public static Rect BoundingRect(InputArray curve)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             curve.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_boundingRect_InputArray(curve.CvPtr);
             GC.KeepAlive(curve);
@@ -2949,7 +3081,7 @@ namespace OpenCvSharp
         public static Rect BoundingRect(IEnumerable<Point> curve)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point[] curveArray = EnumerableEx.ToArray(curve);
             return NativeMethods.imgproc_boundingRect_Point(curveArray, curveArray.Length);
         }
@@ -2962,7 +3094,7 @@ namespace OpenCvSharp
         public static Rect BoundingRect(IEnumerable<Point2f> curve)
         {
             if (curve == null)
-                throw new ArgumentNullException("curve");
+                throw new ArgumentNullException(nameof(curve));
             Point2f[] curveArray = EnumerableEx.ToArray(curve);
             return NativeMethods.imgproc_boundingRect_Point2f(curveArray, curveArray.Length);
         }
@@ -2977,7 +3109,7 @@ namespace OpenCvSharp
         public static double ContourArea(InputArray contour, bool oriented = false)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             contour.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_contourArea_InputArray(contour.CvPtr, oriented ? 1 : 0);
             GC.KeepAlive(contour);
@@ -2992,7 +3124,7 @@ namespace OpenCvSharp
         public static double ContourArea(IEnumerable<Point> contour, bool oriented = false)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point[] contourArray = EnumerableEx.ToArray(contour);
             return NativeMethods.imgproc_contourArea_Point(contourArray, contourArray.Length, oriented ? 1 : 0);
         }
@@ -3005,7 +3137,7 @@ namespace OpenCvSharp
         public static double ContourArea(IEnumerable<Point2f> contour, bool oriented = false)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point2f[] contourArray = EnumerableEx.ToArray(contour);
             return NativeMethods.imgproc_contourArea_Point2f(contourArray, contourArray.Length, oriented ? 1 : 0);
         }
@@ -3019,7 +3151,7 @@ namespace OpenCvSharp
         public static RotatedRect MinAreaRect(InputArray points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             points.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_minAreaRect_InputArray(points.CvPtr);
             GC.KeepAlive(points);
@@ -3033,7 +3165,7 @@ namespace OpenCvSharp
         public static RotatedRect MinAreaRect(IEnumerable<Point> points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             return NativeMethods.imgproc_minAreaRect_Point(pointsArray, pointsArray.Length);
         }
@@ -3045,7 +3177,7 @@ namespace OpenCvSharp
         public static RotatedRect MinAreaRect(IEnumerable<Point2f> points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             return NativeMethods.imgproc_minAreaRect_Point2f(pointsArray, pointsArray.Length);
         }
@@ -3060,7 +3192,7 @@ namespace OpenCvSharp
         public static void MinEnclosingCircle(InputArray points, out Point2f center, out float radius)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             points.ThrowIfDisposed();
             NativeMethods.imgproc_minEnclosingCircle_InputArray(points.CvPtr, out center, out radius);
             GC.KeepAlive(points);
@@ -3075,7 +3207,7 @@ namespace OpenCvSharp
         public static void MinEnclosingCircle(IEnumerable<Point> points, out Point2f center, out float radius)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             NativeMethods.imgproc_minEnclosingCircle_Point(pointsArray, pointsArray.Length, out center, out radius);
         }
@@ -3089,7 +3221,7 @@ namespace OpenCvSharp
         public static void MinEnclosingCircle(IEnumerable<Point2f> points, out Point2f center, out float radius)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             NativeMethods.imgproc_minEnclosingCircle_Point2f(pointsArray, pointsArray.Length, out center, out radius);
         }
@@ -3106,9 +3238,9 @@ namespace OpenCvSharp
         public static double MatchShapes(InputArray contour1, InputArray contour2, ShapeMatchModes method, double parameter = 0)
         {
             if (contour1 == null)
-                throw new ArgumentNullException("contour1");
+                throw new ArgumentNullException(nameof(contour1));
             if (contour2 == null)
-                throw new ArgumentNullException("contour2");
+                throw new ArgumentNullException(nameof(contour2));
             var ret = NativeMethods.imgproc_matchShapes_InputArray(contour1.CvPtr, contour2.CvPtr, (int)method, parameter);
             GC.KeepAlive(contour1);
             GC.KeepAlive(contour2);
@@ -3126,9 +3258,9 @@ namespace OpenCvSharp
             ShapeMatchModes method, double parameter = 0)
         {
             if (contour1 == null)
-                throw new ArgumentNullException("contour1");
+                throw new ArgumentNullException(nameof(contour1));
             if (contour2 == null)
-                throw new ArgumentNullException("contour2");
+                throw new ArgumentNullException(nameof(contour2));
             Point[] contour1Array = EnumerableEx.ToArray(contour1);
             Point[] contour2Array = EnumerableEx.ToArray(contour2);
             return NativeMethods.imgproc_matchShapes_Point(contour1Array, contour1Array.Length, 
@@ -3152,13 +3284,14 @@ namespace OpenCvSharp
         public static void ConvexHull(InputArray points, OutputArray hull, bool clockwise = false, bool returnPoints = true)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             if (hull == null)
-                throw new ArgumentNullException("hull");
+                throw new ArgumentNullException(nameof(hull));
             points.ThrowIfDisposed();
             hull.ThrowIfNotReady();
             NativeMethods.imgproc_convexHull_InputArray(points.CvPtr, hull.CvPtr, clockwise ? 1 : 0, returnPoints ? 1 : 0);
             GC.KeepAlive(points);
+            GC.KeepAlive(hull);
             hull.Fix();
         }
 
@@ -3175,7 +3308,7 @@ namespace OpenCvSharp
         public static Point[] ConvexHull(IEnumerable<Point> points, bool clockwise = false)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             IntPtr hullPtr;
             NativeMethods.imgproc_convexHull_Point_ReturnsPoints(pointsArray, pointsArray.Length, out hullPtr, clockwise ? 1 : 0);
@@ -3198,7 +3331,7 @@ namespace OpenCvSharp
         public static Point2f[] ConvexHull(IEnumerable<Point2f> points, bool clockwise = false)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             IntPtr hullPtr;
             NativeMethods.imgproc_convexHull_Point2f_ReturnsPoints(pointsArray, pointsArray.Length, out hullPtr,
@@ -3222,7 +3355,7 @@ namespace OpenCvSharp
         public static int[] ConvexHullIndices(IEnumerable<Point> points, bool clockwise = false)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             IntPtr hullPtr;
             NativeMethods.imgproc_convexHull_Point_ReturnsIndices(pointsArray, pointsArray.Length, out hullPtr, clockwise ? 1 : 0);
@@ -3245,7 +3378,7 @@ namespace OpenCvSharp
         public static int[] ConvexHullIndices(IEnumerable<Point2f> points, bool clockwise = false)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             IntPtr hullPtr;
             NativeMethods.imgproc_convexHull_Point2f_ReturnsIndices(pointsArray, pointsArray.Length, out hullPtr, clockwise ? 1 : 0);
@@ -3275,17 +3408,18 @@ namespace OpenCvSharp
         public static void ConvexityDefects(InputArray contour, InputArray convexHull, OutputArray convexityDefects)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             if (convexHull == null)
-                throw new ArgumentNullException("convexHull");
+                throw new ArgumentNullException(nameof(convexHull));
             if (convexityDefects == null)
-                throw new ArgumentNullException("convexityDefects");
+                throw new ArgumentNullException(nameof(convexityDefects));
             contour.ThrowIfDisposed();
             convexHull.ThrowIfDisposed();
             convexityDefects.ThrowIfNotReady();
             NativeMethods.imgproc_convexityDefects_InputArray(contour.CvPtr, convexHull.CvPtr, convexityDefects.CvPtr);
             GC.KeepAlive(contour);
             GC.KeepAlive(convexHull);
+            GC.KeepAlive(convexityDefects);
             convexityDefects.Fix();
         }
 
@@ -3305,9 +3439,9 @@ namespace OpenCvSharp
         public static Vec4i[] ConvexityDefects(IEnumerable<Point> contour, IEnumerable<int> convexHull)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             if (convexHull == null)
-                throw new ArgumentNullException("convexHull");
+                throw new ArgumentNullException(nameof(convexHull));
             Point[] contourArray = EnumerableEx.ToArray(contour);
             int[] convexHullArray = EnumerableEx.ToArray(convexHull);
             IntPtr convexityDefectsPtr;
@@ -3336,9 +3470,9 @@ namespace OpenCvSharp
         public static Vec4i[] ConvexityDefects(IEnumerable<Point2f> contour, IEnumerable<int> convexHull)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             if (convexHull == null)
-                throw new ArgumentNullException("convexHull");
+                throw new ArgumentNullException(nameof(convexHull));
             Point2f[] contourArray = EnumerableEx.ToArray(contour);
             int[] convexHullArray = EnumerableEx.ToArray(convexHull);
             IntPtr convexityDefectsPtr;
@@ -3361,7 +3495,7 @@ namespace OpenCvSharp
         public static bool IsContourConvex(InputArray contour)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             contour.ThrowIfDisposed();
             int ret = NativeMethods.imgproc_isContourConvex_InputArray(contour.CvPtr);
             GC.KeepAlive(contour);
@@ -3376,7 +3510,7 @@ namespace OpenCvSharp
         public static bool IsContourConvex(IEnumerable<Point> contour)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point[] contourArray = EnumerableEx.ToArray(contour);
             int ret = NativeMethods.imgproc_isContourConvex_Point(contourArray, contourArray.Length);
             return ret != 0;
@@ -3390,7 +3524,7 @@ namespace OpenCvSharp
         public static bool IsContourConvex(IEnumerable<Point2f> contour)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point2f[] contourArray = EnumerableEx.ToArray(contour);
             int ret = NativeMethods.imgproc_isContourConvex_Point2f(contourArray, contourArray.Length);
             return ret != 0;
@@ -3408,17 +3542,18 @@ namespace OpenCvSharp
         public static float IntersectConvexConvex(InputArray p1, InputArray p2, OutputArray p12, bool handleNested = true)
         {
             if (p1 == null)
-                throw new ArgumentNullException("p1");
+                throw new ArgumentNullException(nameof(p1));
             if (p2 == null)
-                throw new ArgumentNullException("p2");
+                throw new ArgumentNullException(nameof(p2));
             if (p12 == null)
-                throw new ArgumentNullException("p12");
+                throw new ArgumentNullException(nameof(p12));
             p1.ThrowIfDisposed();
             p2.ThrowIfDisposed();
             p12.ThrowIfNotReady();
             float ret = NativeMethods.imgproc_intersectConvexConvex_InputArray(p1.CvPtr, p2.CvPtr, p12.CvPtr, handleNested ? 1 : 0);
             GC.KeepAlive(p1);
             GC.KeepAlive(p2);
+            GC.KeepAlive(p12);
             p12.Fix();
             return ret;
         }
@@ -3434,9 +3569,9 @@ namespace OpenCvSharp
             out Point[] p12, bool handleNested = true)
         {
             if (p1 == null)
-                throw new ArgumentNullException("p1");
+                throw new ArgumentNullException(nameof(p1));
             if (p2 == null)
-                throw new ArgumentNullException("p2");
+                throw new ArgumentNullException(nameof(p2));
             Point[] p1Array = EnumerableEx.ToArray(p1);
             Point[] p2Array = EnumerableEx.ToArray(p2);
             IntPtr p12Ptr;
@@ -3462,9 +3597,9 @@ namespace OpenCvSharp
             out Point2f[] p12, bool handleNested = true)
         {
             if (p1 == null)
-                throw new ArgumentNullException("p1");
+                throw new ArgumentNullException(nameof(p1));
             if (p2 == null)
-                throw new ArgumentNullException("p2");
+                throw new ArgumentNullException(nameof(p2));
             Point2f[] p1Array = EnumerableEx.ToArray(p1);
             Point2f[] p2Array = EnumerableEx.ToArray(p2);
             IntPtr p12Ptr;
@@ -3488,7 +3623,7 @@ namespace OpenCvSharp
         public static RotatedRect FitEllipse(InputArray points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             points.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_fitEllipse_InputArray(points.CvPtr);
             GC.KeepAlive(points);
@@ -3502,7 +3637,7 @@ namespace OpenCvSharp
         public static RotatedRect FitEllipse(IEnumerable<Point> points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             return NativeMethods.imgproc_fitEllipse_Point(pointsArray, pointsArray.Length);
         }
@@ -3514,7 +3649,7 @@ namespace OpenCvSharp
         public static RotatedRect FitEllipse(IEnumerable<Point2f> points)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             return NativeMethods.imgproc_fitEllipse_Point2f(pointsArray, pointsArray.Length);
         }
@@ -3543,13 +3678,14 @@ namespace OpenCvSharp
             double param, double reps, double aeps)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             if (line == null)
-                throw new ArgumentNullException("line");
+                throw new ArgumentNullException(nameof(line));
             points.ThrowIfDisposed();
             line.ThrowIfNotReady();
             NativeMethods.imgproc_fitLine_InputArray(points.CvPtr, line.CvPtr, (int)distType, param, reps, aeps);
             GC.KeepAlive(points);
+            GC.KeepAlive(line);
             line.Fix();
         }
 
@@ -3569,7 +3705,7 @@ namespace OpenCvSharp
             double param, double reps, double aeps)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point[] pointsArray = EnumerableEx.ToArray(points);
             float[] line = new float[4];
             NativeMethods.imgproc_fitLine_Point(pointsArray, pointsArray.Length, line, (int)distType, param, reps, aeps);
@@ -3592,7 +3728,7 @@ namespace OpenCvSharp
             double param, double reps, double aeps)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point2f[] pointsArray = EnumerableEx.ToArray(points);
             float[] line = new float[4];
             NativeMethods.imgproc_fitLine_Point2f(pointsArray, pointsArray.Length, line, (int)distType, param, reps, aeps);
@@ -3615,7 +3751,7 @@ namespace OpenCvSharp
             double param, double reps, double aeps)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point3i[] pointsArray = EnumerableEx.ToArray(points);
             float[] line = new float[6];
             NativeMethods.imgproc_fitLine_Point3i(pointsArray, pointsArray.Length, line, (int)distType, param, reps, aeps);
@@ -3638,7 +3774,7 @@ namespace OpenCvSharp
             double param, double reps, double aeps)
         {
             if (points == null)
-                throw new ArgumentNullException("points");
+                throw new ArgumentNullException(nameof(points));
             Point3f[] pointsArray = EnumerableEx.ToArray(points);
             float[] line = new float[6];
             NativeMethods.imgproc_fitLine_Point3f(pointsArray, pointsArray.Length, line, (int)distType, param, reps, aeps);
@@ -3656,7 +3792,7 @@ namespace OpenCvSharp
         public static double PointPolygonTest(InputArray contour, Point2f pt, bool measureDist)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             contour.ThrowIfDisposed();
             var ret = NativeMethods.imgproc_pointPolygonTest_InputArray(contour.CvPtr, pt, measureDist ? 1 : 0);
             GC.KeepAlive(contour);
@@ -3673,7 +3809,7 @@ namespace OpenCvSharp
         public static double PointPolygonTest(IEnumerable<Point> contour, Point2f pt, bool measureDist)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point[] contourArray = EnumerableEx.ToArray(contour);
             return NativeMethods.imgproc_pointPolygonTest_Point(contourArray, contourArray.Length, pt, measureDist ? 1 : 0);
         }
@@ -3691,7 +3827,7 @@ namespace OpenCvSharp
         public static double PointPolygonTest(IEnumerable<Point2f> contour, Point2f pt, bool measureDist)
         {
             if (contour == null)
-                throw new ArgumentNullException("contour");
+                throw new ArgumentNullException(nameof(contour));
             Point2f[] contourArray = EnumerableEx.ToArray(contour);
             return NativeMethods.imgproc_pointPolygonTest_Point2f(contourArray, contourArray.Length, pt, measureDist ? 1 : 0);
         }
@@ -3717,12 +3853,12 @@ namespace OpenCvSharp
             RotatedRect rect1, RotatedRect rect2, OutputArray intersectingRegion)
         {
             if (intersectingRegion == null)
-                throw new ArgumentNullException("intersectingRegion");
+                throw new ArgumentNullException(nameof(intersectingRegion));
             intersectingRegion.ThrowIfNotReady();
 
             int ret = NativeMethods.imgproc_rotatedRectangleIntersection_OutputArray(
                 rect1, rect2, intersectingRegion.CvPtr);
-
+            GC.KeepAlive(intersectingRegion);
             intersectingRegion.Fix();
 
             return (RectanglesIntersectTypes)ret;
@@ -3746,7 +3882,7 @@ namespace OpenCvSharp
         {
             using (var intersectingRegionVec = new VectorOfPoint2f())
             {
-                int ret = NativeMethods.imgproc_rotatedRectangleIntersection_OutputArray(
+                int ret = NativeMethods.imgproc_rotatedRectangleIntersection_vector(
                     rect1, rect2, intersectingRegionVec.CvPtr);
                 intersectingRegion = intersectingRegionVec.ToArray();
                 return (RectanglesIntersectTypes) ret;
@@ -3764,13 +3900,14 @@ namespace OpenCvSharp
         public static void ApplyColorMap(InputArray src, OutputArray dst, ColormapTypes colormap)
         {
             if (src == null)
-                throw new ArgumentNullException("src");
+                throw new ArgumentNullException(nameof(src));
             if (dst == null)
-                throw new ArgumentNullException("dst");
+                throw new ArgumentNullException(nameof(dst));
             src.ThrowIfDisposed();
             dst.ThrowIfNotReady();
             NativeMethods.imgproc_applyColorMap(src.CvPtr, dst.CvPtr, (int)colormap);
             GC.KeepAlive(src);
+            GC.KeepAlive(dst);
             dst.Fix();
         }
 
@@ -3837,10 +3974,11 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfNotReady();
             NativeMethods.imgproc_line(img.CvPtr, pt1, pt2, color, thickness, (int)lineType, shift);
             img.Fix();
+            GC.KeepAlive(img);
         }
         #endregion
 
@@ -3867,12 +4005,12 @@ namespace OpenCvSharp
             double tipLength = 0.1)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfNotReady();
 
             NativeMethods.imgproc_arrowedLine(
                 img.CvPtr, pt1, pt2, color, thickness, (int)lineType, shift, tipLength);
-
+            GC.KeepAlive(img);
             img.Fix();
         }
 
@@ -3905,9 +4043,10 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             NativeMethods.imgproc_rectangle_InputOutputArray(img.CvPtr, pt1, pt2, color, thickness, (int)lineType, shift);
             img.Fix();
+            GC.KeepAlive(img);
         }
 
 #if LANG_JP
@@ -3936,9 +4075,10 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             NativeMethods.imgproc_rectangle_InputOutputArray(img.CvPtr, rect.TopLeft, rect.BottomRight, color, thickness, (int)lineType, shift);
             img.Fix();
+            GC.KeepAlive(img);
         }
 
 #if LANG_JP
@@ -3969,7 +4109,7 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             Rect rect = Rect.FromLTRB(pt1.X, pt1.Y, pt2.X, pt2.Y);
             NativeMethods.imgproc_rectangle_Mat(img.CvPtr, rect, color, thickness, (int)lineType, shift);
             GC.KeepAlive(img);
@@ -4000,7 +4140,7 @@ namespace OpenCvSharp
             Mat img, Rect rect, Scalar color, int thickness = 1, LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             NativeMethods.imgproc_rectangle_Mat(img.CvPtr, rect, color, thickness, (int)lineType, shift);
             GC.KeepAlive(img);
         }
@@ -4065,10 +4205,11 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
             NativeMethods.imgproc_circle(img.CvPtr, center, radius, color, thickness, (int)lineType, shift);
             img.Fix();
+            GC.KeepAlive(img);
         }
         #endregion
         #region Ellipse
@@ -4106,10 +4247,11 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfNotReady();
             NativeMethods.imgproc_ellipse1(img.CvPtr, center, axes, angle, startAngle, endAngle, color, thickness, (int)lineType, shift);
             img.Fix();
+            GC.KeepAlive(img);
         }
 
 #if LANG_JP
@@ -4135,10 +4277,11 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
             NativeMethods.imgproc_ellipse2(img.CvPtr, box, color, thickness, (int)lineType);
             img.Fix();
+            GC.KeepAlive(img);
         }
         #endregion
         #region FillConvexPoly
@@ -4165,7 +4308,7 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
 
             Point[] ptsArray = EnumerableEx.ToArray(pts);
@@ -4196,9 +4339,9 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (pts == null) 
-                throw new ArgumentNullException("pts");
+                throw new ArgumentNullException(nameof(pts));
             img.ThrowIfDisposed();
             pts.ThrowIfDisposed();
 
@@ -4235,7 +4378,7 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0, Point? offset = null)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
             Point offset0 = offset.GetValueOrDefault(new Point());
 
@@ -4255,6 +4398,7 @@ namespace OpenCvSharp
                 NativeMethods.imgproc_fillPoly_Mat(
                     img.CvPtr, ptsPtr.Pointer, npts, ncontours, color, (int)lineType, shift, offset0);
             }
+            GC.KeepAlive(img);
         }
 
 #if LANG_JP
@@ -4283,16 +4427,16 @@ namespace OpenCvSharp
             LineTypes lineType = LineTypes.Link8, int shift = 0, Point? offset = null)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (pts == null) 
-                throw new ArgumentNullException("pts");
+                throw new ArgumentNullException(nameof(pts));
             img.ThrowIfDisposed();
             pts.ThrowIfDisposed();
             Point offset0 = offset.GetValueOrDefault(new Point());
 
             NativeMethods.imgproc_fillPoly_InputOutputArray(
                 img.CvPtr, pts.CvPtr, color, (int)lineType, shift, offset0);
-
+            GC.KeepAlive(img);
             GC.KeepAlive(pts);
             img.Fix();
         }
@@ -4313,7 +4457,7 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             img.ThrowIfDisposed();
 
             List<Point[]> ptsList = new List<Point[]>();
@@ -4331,6 +4475,7 @@ namespace OpenCvSharp
             {
                 NativeMethods.imgproc_polylines_Mat(
                     img.CvPtr, ptsPtr.Pointer, npts, ncontours, isClosed ? 1 : 0, color, thickness, (int)lineType, shift);
+                GC.KeepAlive(img);
             }
         }
 
@@ -4349,15 +4494,15 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8, int shift = 0)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (pts == null)
-                throw new ArgumentNullException("pts");
+                throw new ArgumentNullException(nameof(pts));
             img.ThrowIfDisposed();
             pts.ThrowIfDisposed();
 
             NativeMethods.imgproc_polylines_InputOutputArray(
                 img.CvPtr, pts.CvPtr, isClosed ? 1 : 0, color, thickness, (int)lineType, shift);
-
+            GC.KeepAlive(img);
             img.Fix();
             GC.KeepAlive(pts);
         }
@@ -4411,9 +4556,9 @@ namespace OpenCvSharp
             Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (contours == null)
-                throw new ArgumentNullException("contours");
+                throw new ArgumentNullException(nameof(contours));
             image.ThrowIfNotReady();
 
             Point offset0 = offset.GetValueOrDefault(new Point());
@@ -4433,7 +4578,7 @@ namespace OpenCvSharp
                         contourIdx, color, thickness, (int)lineType, hiearchyVecs, hiearchyVecs.Length, maxLevel, offset0);
                 }
             }
-
+            GC.KeepAlive(image);
             image.Fix();
         }
 #if LANG_JP
@@ -4482,9 +4627,9 @@ namespace OpenCvSharp
             Point? offset = null)
         {
             if (image == null)
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             if (contours == null)
-                throw new ArgumentNullException("contours");
+                throw new ArgumentNullException(nameof(contours));
             image.ThrowIfNotReady();
 
             Point offset0 = offset.GetValueOrDefault(new Point());
@@ -4492,6 +4637,9 @@ namespace OpenCvSharp
             NativeMethods.imgproc_drawContours_InputArray(image.CvPtr, contoursPtr, contoursPtr.Length,
                         contourIdx, color, thickness, (int)lineType, ToPtr(hierarchy), maxLevel, offset0);
             image.Fix();
+            GC.KeepAlive(image);
+            GC.KeepAlive(contours);
+            GC.KeepAlive(hierarchy);
         }
         #endregion
 
@@ -4579,13 +4727,14 @@ namespace OpenCvSharp
             int thickness = 1, LineTypes lineType = LineTypes.Link8, bool bottomLeftOrigin = false)
         {
             if (img == null)
-                throw new ArgumentNullException("img");
+                throw new ArgumentNullException(nameof(img));
             if (String.IsNullOrEmpty(text))
                 throw new ArgumentNullException(text);
             img.ThrowIfDisposed();
             NativeMethods.core_putText(img.CvPtr, text, org, (int)fontFace, fontScale, color,
                 thickness, (int)lineType, bottomLeftOrigin ? 1 : 0);
             img.Fix();
+            GC.KeepAlive(img);
         }
 
         /// <summary>

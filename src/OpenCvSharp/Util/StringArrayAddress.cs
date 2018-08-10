@@ -4,31 +4,24 @@ using System.Text;
 
 namespace OpenCvSharp.Util
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class to get address of string array
     /// </summary>
     public class StringArrayAddress : ArrayAddress2<byte>
     {
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="stringArray"></param>
-        public StringArrayAddress(string[] stringArray)
+        /// <param name="stringEnumerable"></param>
+        public StringArrayAddress(IEnumerable<string> stringEnumerable)
         {
             var byteList = new List<byte[]>();
-            for (int i = 0; i < stringArray.Length; i++)
+            foreach (var s in stringEnumerable)
             {
-                byteList.Add(Encoding.ASCII.GetBytes(stringArray[i]));
+                byteList.Add(Encoding.ASCII.GetBytes(s));
             }
             Initialize(byteList.ToArray());
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="enumerable"></param>
-        public StringArrayAddress(IEnumerable<string> enumerable)
-            : this(EnumerableEx.ToArray(enumerable))
-        {
         }
     }
 }

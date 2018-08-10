@@ -1,14 +1,19 @@
 #ifndef _INCLUDE_OPENCV_H_
 #define _INCLUDE_OPENCV_H_
 
-#define ENABLED_CONTRIB
-#undef ENABLED_CONTRIB
+//#define ENABLED_CONTRIB
+//#undef ENABLED_CONTRIB
 
 #ifdef _MSC_VER
+#define NOMINMAX
+#define _CRT_SECURE_NO_WARNINGS
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #pragma warning(disable: 4996)
 #endif
+
+#define OPENCV_TRAITS_ENABLE_DEPRECATED
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d/calib3d_c.h>
 #include <opencv2/core/core_c.h>
@@ -21,12 +26,17 @@
 #include <opencv2/video.hpp>
 
 // opencv_contrib
-#ifdef ENABLED_CONTRIB
+#include <opencv2/aruco.hpp>
 #include <opencv2/bgsegm.hpp>
+#include <opencv2/dnn.hpp>
 #include <opencv2/face.hpp>
+#include <opencv2/img_hash.hpp>
 #include <opencv2/optflow.hpp>
+#include <opencv2/tracking.hpp>
 #include <opencv2/xfeatures2d.hpp>
-#endif
+#include <opencv2/ximgproc.hpp>
+#include <opencv2/xphoto.hpp>
+#include <opencv2/text.hpp>
 
 #include <vector>
 #include <algorithm>
